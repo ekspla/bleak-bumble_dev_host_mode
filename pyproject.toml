@@ -1,0 +1,58 @@
+[tool.poetry]
+name = "bleak_bumble"
+version = "0.0.1"
+description = "Bumble transport layer for Bleak - Out-of-tree Bumble backend"
+authors = ["Victor Chavez <vchavezb@protonmail.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/vChavezB/bleak-bumble"
+repository = "https://github.com/vChavezB/bleak-bumble"
+documentation = "https://github.com/vChavezB/bleak-bumble/blob/main/README.md"
+keywords = ["bluetooth", "ble", "bumble", "bleak", "asyncio"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10", 
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Networking",
+    "Operating System :: OS Independent",
+]
+
+[tool.poetry.dependencies]
+python = ">=3.9"
+bleak = ">=1.0.0,<1.1.0"
+bumble = "0.0.211"
+
+[tool.poetry.group.dev.dependencies]
+black = "^25.1.0"
+isort = "^6.0.1"
+pytest = "^8.4.1"
+pytest-asyncio = "^1.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-v --tb=short"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]  
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+
+[tool.black]
+line-length = 88
+target-version = ["py311"] 
+
+[tool.isort]
+profile = "black"
+line_length = 88
+known_first_party = ["bleak_bumble"]
+src_paths = ["bleak_bumble", "tests"]
