@@ -140,3 +140,6 @@ Thumbs.db
 
 # Poetry
 poetry.lock
+
+# Editor
+**/*.bak
