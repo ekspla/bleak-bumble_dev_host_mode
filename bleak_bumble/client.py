@@ -38,6 +38,7 @@ else:
     from collections.abc import Buffer
 
 from bumble.hci import Address
+from bumble.core import TimeoutError
 CLIENT_BD_ADDR = "F0:F1:F2:F3:F4:F5"
 
 
@@ -71,6 +72,9 @@ class BleakClientBumble(BaseBleakClient):
         self._host_mode: Final[bool] = kwargs.get(
             "host_mode", is_host_mode_enabled_from_env()
         )
+        self._timeout: Final[float] = kwargs.get(
+            "timeout", 60.0
+        )
 
     @property
     def mtu_size(self) -> int:
@@ -85,7 +89,7 @@ class BleakClientBumble(BaseBleakClient):
             Boolean representing connection status.
 
         """
-        transport = await start_transport(self._cfg, self._host_mode)
+        self._transport = transport = await start_transport(self._cfg, self._host_mode)
         if not self._host_mode:
             self._dev = Device("client")
             self._dev.host = Host()
@@ -95,8 +99,15 @@ class BleakClientBumble(BaseBleakClient):
                 "client", Address(CLIENT_BD_ADDR), transport.source, transport.sink
             )
         self._dev.on("connection", self.on_connection)
+ 
+        if self._dev.is_scanning:
+            await self.device.stop_scanning()
         await self._dev.power_on()
-        await self._dev.connect(self.address)
+        try:
+            await self._dev.connect(self.address, timeout=self._timeout)
+        except TimeoutError:
+            await self._transport.close()
+            logger.debug("Connection timed out")
 
         self.services: BleakGATTServiceCollection = await self.get_services()
         return True
@@ -116,6 +127,7 @@ class BleakClientBumble(BaseBleakClient):
         await self._dev.disconnect(
             self._connection, HCI_REMOTE_USER_TERMINATED_CONNECTION_ERROR
         )
+        await self._transport.close()
         return True
 
     async def pair(self, *args, **kwargs) -> bool:
