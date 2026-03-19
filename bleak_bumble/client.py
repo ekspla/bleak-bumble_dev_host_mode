@@ -37,6 +37,9 @@ if sys.version_info < (3, 12):
 else:
     from collections.abc import Buffer
 
+from bumble.hci import Address
+CLIENT_BD_ADDR = "F0:F1:F2:F3:F4:F5"
+
 
 logger = logging.getLogger(__name__)
 
@@ -82,12 +85,16 @@ class BleakClientBumble(BaseBleakClient):
             Boolean representing connection status.
 
         """
-        self._dev = Device("client")
-        self._dev.on("connection", self.on_connection)
-        self._dev.host = Host()
+        transport = await start_transport(self._cfg, self._host_mode)
         if not self._host_mode:
+            self._dev = Device("client")
+            self._dev.host = Host()
             self._dev.host.controller = Controller("Client", link=get_link())
-        await start_transport(self._cfg, self._host_mode)
+        else:
+            self._dev = Device.with_hci(
+                "client", Address(CLIENT_BD_ADDR), transport.source, transport.sink
+            )
+        self._dev.on("connection", self.on_connection)
         await self._dev.power_on()
         await self._dev.connect(self.address)
 

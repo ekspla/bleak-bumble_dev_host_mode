@@ -36,7 +36,7 @@ SERVICE_UUID_TYPES: Final[Tuple] = (
 )
 
 # Arbitrary BD_ADDR for the scanner device
-SCANNER_BD_ADDR = "00:00:00:00:00:00"
+SCANNER_BD_ADDR = "F0:F1:F2:F3:F4:F5"
 
 
 def get_local_name(adv: Advertisement) -> str:
