@@ -9,7 +9,7 @@
 ## Installation
 
 ```bash
-pip install -e git+https://github.com/vChavezB/bleak-bumble.git
+pip install -e git+https://github.com/vChavezB/bleak-bumble.git#egg=bleak_bumble
 ```
 
 ## Quick Start
@@ -33,6 +33,16 @@ async for device, advertisement_data in scanner.advertisement_data():
     # ... work with device
     await client.disconnect()
 ```
+
+Instead of using `cfg` and `host_mode`, one can use environmental variables as followings.
+```python
+import os
+# Set environment variables
+#os.environ["BLEAK_BUMBLE"] = "serial:/dev/ttyUSB0,1000000,rtscts"
+os.environ["BLEAK_BUMBLE"] = "usb:0"
+os.environ["BLEAK_BUMBLE_HOST"] = "1"
+```
+`backend=BleakScannerBumble` and `backend=BleakClientBumble` are necessary in this case.  
 
 ## Documentation
 
