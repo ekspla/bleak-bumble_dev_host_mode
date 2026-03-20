@@ -101,7 +101,7 @@ class BleakClientBumble(BaseBleakClient):
         self._dev.on("connection", self.on_connection)
  
         if self._dev.is_scanning:
-            await self.device.stop_scanning()
+            await self._dev.stop_scanning()
         await self._dev.power_on()
         try:
             await self._dev.connect(self.address, timeout=self._timeout)
