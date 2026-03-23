@@ -24,7 +24,6 @@ from bumble.core import TimeoutError
 from bumble.device import Connection, Device, Peer
 from bumble.hci import Address, HCI_REMOTE_USER_TERMINATED_CONNECTION_ERROR
 from bumble.host import Host
-from bumble.transport import Transport
 
 from bleak_bumble import (
     BumbleTransportCfg,
@@ -43,7 +42,7 @@ else:
     from typing import override as override
     from collections.abc import Buffer
 
-# Private static BD_ADDR. Use with suffix '/P' for public address.
+# A static BD_ADDR. Use with suffix '/P' for public (fixed) address.
 CLIENT_BD_ADDR = "F0:F1:F2:F3:F4:F5"
 
 
@@ -89,12 +88,10 @@ class BleakClientBumble(BaseBleakClient):
         """Connect to the specified GATT server.
 
         Returns:
-            #Boolean representing connection status.
             None.
 
         """
         timeout = kwargs.get("timeout", self._timeout)
-        #self._transport = transport = await start_transport(self._cfg, self._host_mode)
         transport = await start_transport(self._cfg, self._host_mode)
         if not self._host_mode:
             self._dev = Device("client")
@@ -119,9 +116,8 @@ class BleakClientBumble(BaseBleakClient):
                 await sleep(1) # Wait for stabilization.
             logger.debug("Connection timed out")
 
-        if not self._connection:
-            return None
-        self.services: BleakGATTServiceCollection = await self.get_services()
+        if self._connection:
+            self.services: BleakGATTServiceCollection = await self.get_services()
         return None
 
     @override
@@ -129,7 +125,6 @@ class BleakClientBumble(BaseBleakClient):
         """Disconnect from the specified GATT server.
 
         Returns:
-            #Boolean representing connection status.
             None.
 
         """

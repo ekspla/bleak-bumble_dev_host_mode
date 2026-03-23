@@ -15,7 +15,6 @@ from bumble.core import UUID, AdvertisingData
 from bumble.device import Advertisement, Device
 from bumble.hci import Address
 from bumble.host import Host
-from bumble.transport import Transport
 
 from bleak_bumble import (
     BumbleTransportCfg,
@@ -40,7 +39,7 @@ SERVICE_UUID_TYPES: Final[Tuple] = (
 
 # Arbitrary BD_ADDR for the scanner device
 #SCANNER_BD_ADDR = "00:00:00:00:00:00"
-# Private static BD_ADDR. Use with suffix '/P' for public address.
+# A static BD_ADDR. Use with suffix '/P' for public (fixed) address.
 SCANNER_BD_ADDR = "F0:F1:F2:F3:F4:F5"
 
 
