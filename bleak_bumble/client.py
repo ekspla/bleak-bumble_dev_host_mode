@@ -129,14 +129,12 @@ class BleakClientBumble(BaseBleakClient):
             None.
 
         """
-        if not self._dev:
-            return None
-        if not self._connection:
-            return None
+        await sleep(1)
+        if self._dev and self._connection:
+            await self._dev.disconnect(
+                self._connection, HCI_REMOTE_USER_TERMINATED_CONNECTION_ERROR
+            )
 
-        await self._dev.disconnect(
-            self._connection, HCI_REMOTE_USER_TERMINATED_CONNECTION_ERROR
-        )
         # The transport must be closed in host_mode.
         if self._host_mode:
             await transports[str(self._cfg)].close()
