@@ -37,8 +37,10 @@ from bleak_bumble import (
 from bleak_bumble.utils import bumble_uuid_to_str
 
 if sys.version_info < (3, 12):
+    from typing_extensions import override as override
     from typing_extensions import Buffer
 else:
+    from typing import override as override
     from collections.abc import Buffer
 
 # Private static BD_ADDR. Use with suffix '/P' for public address.
@@ -75,10 +77,6 @@ class BleakClientBumble(BaseBleakClient):
         self._host_mode: Final[bool] = kwargs.get(
             "host_mode", is_host_mode_enabled_from_env()
         )
-        self._timeout: Final[float] = kwargs.get(
-            "timeout", 60.0
-        )
-        self._transport: Optional[Transport] = None
 
     @property
     def mtu_size(self) -> int:
@@ -86,14 +84,18 @@ class BleakClientBumble(BaseBleakClient):
             raise BleakError("Not connected")
         return self._connection.att_mtu
 
-    async def connect(self, pair: bool = False, **kwargs) -> bool:
+    @override
+    async def connect(self, pair: bool = False, **kwargs) -> None:
         """Connect to the specified GATT server.
 
         Returns:
-            Boolean representing connection status.
+            #Boolean representing connection status.
+            None.
 
         """
-        self._transport = transport = await start_transport(self._cfg, self._host_mode)
+        timeout = kwargs.get("timeout", self._timeout)
+        #self._transport = transport = await start_transport(self._cfg, self._host_mode)
+        transport = await start_transport(self._cfg, self._host_mode)
         if not self._host_mode:
             self._dev = Device("client")
             self._dev.host = Host()
@@ -108,56 +110,60 @@ class BleakClientBumble(BaseBleakClient):
             await self._dev.stop_scanning()
         await self._dev.power_on()
         try:
-            await self._dev.connect(self.address, timeout=self._timeout)
+            await self._dev.connect(self.address, timeout=timeout)
         except TimeoutError:
             # The transport must be closed in host_mode.
             if self._host_mode:
-                await self._transport.close()
+                await transports[str(self._cfg)].close()
                 del transports[str(self._cfg)]
-                await sleep(1) # Wait for stability.
+                await sleep(1) # Wait for stabilization.
             logger.debug("Connection timed out")
 
         if not self._connection:
-            return False
+            return None
         self.services: BleakGATTServiceCollection = await self.get_services()
-        return True
+        return None
 
-    async def disconnect(self) -> bool:
+    @override
+    async def disconnect(self) -> None:
         """Disconnect from the specified GATT server.
 
         Returns:
-            Boolean representing connection status.
+            #Boolean representing connection status.
+            None.
 
         """
         if not self._dev:
-            return False
+            return None
         if not self._connection:
-            return False
+            return None
 
         await self._dev.disconnect(
             self._connection, HCI_REMOTE_USER_TERMINATED_CONNECTION_ERROR
         )
         # The transport must be closed in host_mode.
         if self._host_mode:
-            await self._transport.close()
+            await transports[str(self._cfg)].close()
             del transports[str(self._cfg)]
             self._dev = None
-            await sleep(1) # Wait for stability.
-        return True
+            await sleep(1) # Wait for stabilization.
+        return None
 
-    async def pair(self, *args, **kwargs) -> bool:
+    @override
+    async def pair(self, *args, **kwargs) -> None:
         """Pair with the peripheral."""
         if not self._peer:
-            return False
+            return None
         await self._peer.connection.pair()
-        return True
+        return None
 
-    async def unpair(self) -> bool:
+    @override
+    async def unpair(self) -> None:
         """Unpair with the peripheral."""
         warnings.warn(
             "Unpairing is seemingly unavailable in the Bumble API at the moment."
         )
-        return False
+        return None
 
     @property
     def is_connected(self) -> bool:
@@ -215,6 +221,7 @@ class BleakClientBumble(BaseBleakClient):
 
         return new_services
 
+    @override
     async def read_gatt_char(
         self,
         char_specifier: Union[BleakGATTCharacteristic, int, str, uuid.UUID],
@@ -247,6 +254,7 @@ class BleakClientBumble(BaseBleakClient):
         logger.debug(f"Read Characteristic {characteristic.uuid} : {value.hex()}")
         return bytearray(value)
 
+    @override
     async def read_gatt_descriptor(self, handle: int, **kwargs) -> bytearray:
         """Perform read operation on the specified GATT descriptor.
 
@@ -281,6 +289,7 @@ class BleakClientBumble(BaseBleakClient):
         await characteristic.obj.write_value(data, with_response=response)
         logger.debug(f"Write Characteristic {characteristic.uuid} : {data}")
 
+    @override
     async def write_gatt_descriptor(self, handle: int, data: Buffer) -> None:
         """Perform a write operation on the specified GATT descriptor.
 

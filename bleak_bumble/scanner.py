@@ -154,8 +154,6 @@ class BleakScannerBumble(BaseBleakScanner):
         self._host_mode: Final[bool] = kwargs.get(
             "host_mode", is_host_mode_enabled_from_env()
         )
-        self._transport: Optional[Transport] = None
-        #self._stop: Optional[Callable[[], Coroutine[Any, Any, None]]] = None
 
     def on_advertisement(self, advertisement: Advertisement):
         local_name = get_local_name(advertisement)
@@ -182,13 +180,12 @@ class BleakScannerBumble(BaseBleakScanner):
         pass
 
     async def start(self) -> None:
-        self._transport = transport = await start_transport(self._cfg, self._host_mode)
+        transport = await start_transport(self._cfg, self._host_mode)
         if not self._host_mode:
             self._dev = Device("scanner", address=Address(SCANNER_BD_ADDR))
             self._dev.host = Host()
             self._dev.host.controller = Controller("scanner", link=get_link())
         else:
-            #dev_address = Address.generate_static_address()
             self._dev = Device.with_hci(
                 "scanner", Address(SCANNER_BD_ADDR), transport.source, transport.sink
             )
@@ -202,10 +199,10 @@ class BleakScannerBumble(BaseBleakScanner):
         await self._dev.stop_scanning()
         # The transport must be closed in host_mode.
         if self._host_mode:
-            await self._transport.close()
+            await transports[str(self._cfg)].close()
             del transports[str(self._cfg)]
         await self._dev.power_off()
-        await sleep(1) # Wait for stability.
+        await sleep(1) # Wait for stabilization.
         self._dev = None
 
     def set_scanning_filter(self, **kwargs) -> None:
