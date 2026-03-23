@@ -92,6 +92,9 @@ class BleakClientBumble(BaseBleakClient):
             None.
 
         """
+        if pair:
+            logger.debug("Explicit pairing is not implemented in Bumble backend.")
+
         timeout = kwargs.get("timeout", self._timeout)
         transport = await start_transport(self._cfg, self._host_mode)
         if not self._host_mode:
@@ -129,7 +132,7 @@ class BleakClientBumble(BaseBleakClient):
             None.
 
         """
-        await sleep(1)
+        await sleep(1) # Avoid race condition with the delay.
         if self._dev and self._connection:
             await self._dev.disconnect(
                 self._connection, HCI_REMOTE_USER_TERMINATED_CONNECTION_ERROR
