@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2024 Victor Chavez <vchavezb@protonmail.com>
 
+from asyncio import sleep
 import logging
 from typing import Dict, Final, List, Literal, Optional, Tuple
 
@@ -14,6 +15,7 @@ from bumble.core import UUID, AdvertisingData
 from bumble.device import Advertisement, Device
 from bumble.hci import Address
 from bumble.host import Host
+from bumble.transport import Transport
 
 from bleak_bumble import (
     BumbleTransportCfg,
@@ -21,6 +23,7 @@ from bleak_bumble import (
     get_link,
     is_host_mode_enabled_from_env,
     start_transport,
+    transports,
 )
 from bleak_bumble.utils import bumble_uuid_to_str
 
@@ -36,6 +39,8 @@ SERVICE_UUID_TYPES: Final[Tuple] = (
 )
 
 # Arbitrary BD_ADDR for the scanner device
+#SCANNER_BD_ADDR = "00:00:00:00:00:00"
+# Private static BD_ADDR. Use with suffix '/P' for public address.
 SCANNER_BD_ADDR = "F0:F1:F2:F3:F4:F5"
 
 
@@ -141,7 +146,7 @@ class BleakScannerBumble(BaseBleakScanner):
     ):
         super().__init__(detection_callback, service_uuids)
 
-        self._device: Optional[Device] = None
+        self._dev: Optional[Device] = None
         self._scan_active: Final = scanning_mode == "active"
         self._cfg: Final[BumbleTransportCfg] = kwargs.get(
             "cfg", get_default_transport_cfg()
@@ -149,6 +154,8 @@ class BleakScannerBumble(BaseBleakScanner):
         self._host_mode: Final[bool] = kwargs.get(
             "host_mode", is_host_mode_enabled_from_env()
         )
+        self._transport: Optional[Transport] = None
+        #self._stop: Optional[Callable[[], Coroutine[Any, Any, None]]] = None
 
     def on_advertisement(self, advertisement: Advertisement):
         local_name = get_local_name(advertisement)
@@ -175,25 +182,31 @@ class BleakScannerBumble(BaseBleakScanner):
         pass
 
     async def start(self) -> None:
-        transport = await start_transport(self._cfg, self._host_mode)
+        self._transport = transport = await start_transport(self._cfg, self._host_mode)
         if not self._host_mode:
-            self._device = Device("scanner", address=Address(SCANNER_BD_ADDR))
-            self._device.host = Host()
-            self._device.host.controller = Controller("scanner", link=get_link())
+            self._dev = Device("scanner", address=Address(SCANNER_BD_ADDR))
+            self._dev.host = Host()
+            self._dev.host.controller = Controller("scanner", link=get_link())
         else:
-            self._device = Device.with_hci(
+            #dev_address = Address.generate_static_address()
+            self._dev = Device.with_hci(
                 "scanner", Address(SCANNER_BD_ADDR), transport.source, transport.sink
             )
-        self._device.on("advertisement", self.on_advertisement)
-        await self._device.power_on()
-        await self._device.start_scanning(active=self._scan_active)
+        self._dev.on("advertisement", self.on_advertisement)
+        await self._dev.power_on()
+        await self._dev.start_scanning(active=self._scan_active)
 
     async def stop(self) -> None:
-        if self._device is None:
+        if self._dev is None:
             raise RuntimeError("Scanner not started")
-        await self._device.stop_scanning()
-        await self._device.power_off()
-        self._device = None
+        await self._dev.stop_scanning()
+        # The transport must be closed in host_mode.
+        if self._host_mode:
+            await self._transport.close()
+            del transports[str(self._cfg)]
+        await self._dev.power_off()
+        await sleep(1) # Wait for stability.
+        self._dev = None
 
     def set_scanning_filter(self, **kwargs) -> None:
         # Implement scanning filter setup

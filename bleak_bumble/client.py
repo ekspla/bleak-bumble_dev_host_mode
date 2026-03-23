@@ -4,6 +4,7 @@
 BLE Client for Bumble
 """
 
+from asyncio import sleep
 import logging
 import sys
 import uuid
@@ -19,9 +20,11 @@ from bleak.backends.device import BLEDevice
 from bleak.backends.service import BleakGATTService, BleakGATTServiceCollection
 from bleak.exc import BleakCharacteristicNotFoundError, BleakError
 from bumble.controller import Controller
+from bumble.core import TimeoutError
 from bumble.device import Connection, Device, Peer
-from bumble.hci import HCI_REMOTE_USER_TERMINATED_CONNECTION_ERROR
+from bumble.hci import Address, HCI_REMOTE_USER_TERMINATED_CONNECTION_ERROR
 from bumble.host import Host
+from bumble.transport import Transport
 
 from bleak_bumble import (
     BumbleTransportCfg,
@@ -29,6 +32,7 @@ from bleak_bumble import (
     get_link,
     is_host_mode_enabled_from_env,
     start_transport,
+    transports,
 )
 from bleak_bumble.utils import bumble_uuid_to_str
 
@@ -37,8 +41,7 @@ if sys.version_info < (3, 12):
 else:
     from collections.abc import Buffer
 
-from bumble.hci import Address
-from bumble.core import TimeoutError
+# Private static BD_ADDR. Use with suffix '/P' for public address.
 CLIENT_BD_ADDR = "F0:F1:F2:F3:F4:F5"
 
 
@@ -75,6 +78,7 @@ class BleakClientBumble(BaseBleakClient):
         self._timeout: Final[float] = kwargs.get(
             "timeout", 60.0
         )
+        self._transport: Optional[Transport] = None
 
     @property
     def mtu_size(self) -> int:
@@ -106,9 +110,15 @@ class BleakClientBumble(BaseBleakClient):
         try:
             await self._dev.connect(self.address, timeout=self._timeout)
         except TimeoutError:
-            await self._transport.close()
+            # The transport must be closed in host_mode.
+            if self._host_mode:
+                await self._transport.close()
+                del transports[str(self._cfg)]
+                await sleep(1) # Wait for stability.
             logger.debug("Connection timed out")
 
+        if not self._connection:
+            return False
         self.services: BleakGATTServiceCollection = await self.get_services()
         return True
 
@@ -127,7 +137,12 @@ class BleakClientBumble(BaseBleakClient):
         await self._dev.disconnect(
             self._connection, HCI_REMOTE_USER_TERMINATED_CONNECTION_ERROR
         )
-        await self._transport.close()
+        # The transport must be closed in host_mode.
+        if self._host_mode:
+            await self._transport.close()
+            del transports[str(self._cfg)]
+            self._dev = None
+            await sleep(1) # Wait for stability.
         return True
 
     async def pair(self, *args, **kwargs) -> bool:
