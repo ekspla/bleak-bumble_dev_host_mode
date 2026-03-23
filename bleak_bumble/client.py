@@ -78,6 +78,7 @@ class BleakClientBumble(BaseBleakClient):
         )
 
     @property
+    @override
     def mtu_size(self) -> int:
         if not self._connection:
             raise BleakError("Not connected")
@@ -161,6 +162,7 @@ class BleakClientBumble(BaseBleakClient):
         return None
 
     @property
+    @override
     def is_connected(self) -> bool:
         """Check connection status between this client and the server.
 
@@ -267,6 +269,7 @@ class BleakClientBumble(BaseBleakClient):
         logger.debug(f"Read Descriptor {handle} : {val}")
         return val
 
+    @override
     async def write_gatt_char(
         self,
         characteristic: BleakGATTCharacteristic,
@@ -303,6 +306,7 @@ class BleakClientBumble(BaseBleakClient):
         for sub in self._subs[characteristic.handle]:
             sub(value)
 
+    @override
     async def start_notify(
         self,
         characteristic: BleakGATTCharacteristic,
@@ -325,6 +329,7 @@ class BleakClientBumble(BaseBleakClient):
             partial(self.__notify_handler, characteristic)
         )
 
+    @override
     async def stop_notify(
         self, char_specifier: Union[BleakGATTCharacteristic, int, str, uuid.UUID]
     ) -> None:

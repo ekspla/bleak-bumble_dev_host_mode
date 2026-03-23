@@ -3,6 +3,7 @@
 
 from asyncio import sleep
 import logging
+import sys
 from typing import Dict, Final, List, Literal, Optional, Tuple
 
 from bleak.backends.scanner import (
@@ -25,6 +26,11 @@ from bleak_bumble import (
     transports,
 )
 from bleak_bumble.utils import bumble_uuid_to_str
+
+if sys.version_info < (3, 12):
+    from typing_extensions import override as override
+else:
+    from typing import override as override
 
 logger = logging.getLogger(__name__)
 
@@ -178,6 +184,7 @@ class BleakScannerBumble(BaseBleakScanner):
     async def on_connection(self, connection):
         pass
 
+    @override
     async def start(self) -> None:
         transport = await start_transport(self._cfg, self._host_mode)
         if not self._host_mode:
@@ -192,6 +199,7 @@ class BleakScannerBumble(BaseBleakScanner):
         await self._dev.power_on()
         await self._dev.start_scanning(active=self._scan_active)
 
+    @override
     async def stop(self) -> None:
         if self._dev is None:
             raise RuntimeError("Scanner not started")
@@ -205,5 +213,11 @@ class BleakScannerBumble(BaseBleakScanner):
         self._dev = None
 
     def set_scanning_filter(self, **kwargs) -> None:
-        # Implement scanning filter setup
-        pass
+        """Implement scanning filter setup
+
+        Raises:
+            NotImplementedError:
+            This is not implemented yet.
+
+        """
+        raise NotImplementedError("set_scanning_filter is not implemented yet.")
