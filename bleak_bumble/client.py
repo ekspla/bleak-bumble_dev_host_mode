@@ -253,21 +253,21 @@ class BleakClientBumble(BaseBleakClient):
         return bytearray(value)
 
     @override
-    async def read_gatt_descriptor(self, handle: int, **kwargs) -> bytearray:
+    async def read_gatt_descriptor(self, descriptor: BleakGATTDescriptor, **kwargs) -> bytearray:
         """Perform read operation on the specified GATT descriptor.
 
         Args:
-            handle (int): The handle of the descriptor to read from.
+            descriptor: The descriptor to read from.
 
         Returns:
             (bytearray) The read data.
 
         """
-        descriptor = self.services.get_descriptor(handle)
-        if descriptor is None:
-            raise BleakError(f"Descriptor {handle} was not found!")
+        if not self.is_connected:
+            raise BleakError("Not connected")
+
         val = await descriptor.obj.read_value()
-        logger.debug(f"Read Descriptor {handle} : {val}")
+        logger.debug(f"Read Descriptor {descriptor} : {val}")
         return val
 
     @override
@@ -289,19 +289,19 @@ class BleakClientBumble(BaseBleakClient):
         logger.debug(f"Write Characteristic {characteristic.uuid} : {data}")
 
     @override
-    async def write_gatt_descriptor(self, handle: int, data: Buffer) -> None:
+    async def write_gatt_descriptor(self, descriptor: BleakGATTDescriptor, data: Buffer) -> None:
         """Perform a write operation on the specified GATT descriptor.
 
         Args:
-            handle: The handle of the descriptor to read from.
+            descriptor: The descriptor to write to.
             data: The data to send (any bytes-like object).
 
         """
-        descriptor = self.services.get_descriptor(handle)
-        if not descriptor:
-            raise BleakError(f"Descriptor {handle} was not found!")
+        if not self.is_connected:
+            raise BleakError("Not connected")
+
         await descriptor.obj.write_value(data)
-        logger.debug(f"Write Descriptor {handle} : {data}")
+        logger.debug(f"Write Descriptor {descriptor} : {data}")
 
     def __notify_handler(self, characteristic: BleakGATTCharacteristic, value):
         for sub in self._subs[characteristic.handle]:
