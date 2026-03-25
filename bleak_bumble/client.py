@@ -115,8 +115,8 @@ class BleakClientBumble(BaseBleakClient):
         except TimeoutError:
             # The transport must be closed in host_mode.
             if self._host_mode:
-                await transports[str(self._cfg)].close()
-                del transports[str(self._cfg)]
+                transport = transports.pop(str(self._cfg))
+                await transport.close()
                 await sleep(1) # Wait for stabilization.
             logger.debug("Connection timed out")
 
@@ -140,8 +140,8 @@ class BleakClientBumble(BaseBleakClient):
 
         # The transport must be closed in host_mode.
         if self._host_mode:
-            await transports[str(self._cfg)].close()
-            del transports[str(self._cfg)]
+            transport = transports.pop(str(self._cfg))
+            await transport.close()
             self._dev = None
             await sleep(1) # Wait for stabilization.
         return None
