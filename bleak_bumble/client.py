@@ -222,38 +222,33 @@ class BleakClientBumble(BaseBleakClient):
     @override
     async def read_gatt_char(
         self,
-        char_specifier: Union[BleakGATTCharacteristic, int, str, uuid.UUID],
+        characteristic: BleakGATTCharacteristic,
         **kwargs,
     ) -> bytearray:
         """Perform read operation on the specified GATT characteristic.
 
         Args:
-            char_specifier (BleakGATTCharacteristic, int, str or UUID): The characteristic to read from,
-                specified by either integer handle, UUID or directly by the
-                BleakGATTCharacteristic object representing it.
+            characteristic (BleakGATTCharacteristic): The characteristic to read from.
 
         Returns:
             (bytearray) The read data.
 
         """
-        if not isinstance(char_specifier, BleakGATTCharacteristic):
-            characteristic = self.services.get_characteristic(char_specifier)
-            if not characteristic:
-                raise BleakCharacteristicNotFoundError(char_specifier)
-        else:
-            characteristic = char_specifier
-        if not self._peer:
+        if self._peer is None:
             raise BleakError("Not connected")
 
         char_vals = await self._peer.read_characteristics_by_uuid(
             characteristic.obj.uuid
         )
         value = char_vals[0]
-        logger.debug(f"Read Characteristic {characteristic.uuid} : {value.hex()}")
+        logger.debug(f"Read Characteristic {characteristic} : {value.hex()}")
         return bytearray(value)
 
     @override
-    async def read_gatt_descriptor(self, descriptor: BleakGATTDescriptor, **kwargs) -> bytearray:
+    async def read_gatt_descriptor(
+        self, descriptor: BleakGATTDescriptor,
+        **kwargs,
+    ) -> bytearray:
         """Perform read operation on the specified GATT descriptor.
 
         Args:
@@ -289,7 +284,11 @@ class BleakClientBumble(BaseBleakClient):
         logger.debug(f"Write Characteristic {characteristic.uuid} : {data}")
 
     @override
-    async def write_gatt_descriptor(self, descriptor: BleakGATTDescriptor, data: Buffer) -> None:
+    async def write_gatt_descriptor(
+        self,
+        descriptor: BleakGATTDescriptor,
+        data: Buffer
+    ) -> None:
         """Perform a write operation on the specified GATT descriptor.
 
         Args:
@@ -323,6 +322,9 @@ class BleakClientBumble(BaseBleakClient):
         To keep things the same cross-platform, notifications should be preferred
         over indications if possible when a characteristic supports both.
         """
+        if not self.is_connected:
+            raise BleakError("Not connected")
+
         if not self._subs.get(characteristic.handle):
             self._subs[characteristic.handle] = []
         self._subs[characteristic.handle].append(callback)
@@ -332,22 +334,18 @@ class BleakClientBumble(BaseBleakClient):
 
     @override
     async def stop_notify(
-        self, char_specifier: Union[BleakGATTCharacteristic, int, str, uuid.UUID]
+        self,
+        characteristic: BleakGATTCharacteristic,
     ) -> None:
         """Deactivate notification/indication on a specified characteristic.
 
         Args:
-            char_specifier (BleakGATTCharacteristic, int, str or UUID): The characteristic to deactivate
-                notification/indication on, specified by either integer handle, UUID or
-                directly by the BleakGATTCharacteristic object representing it.
+            characteristic (BleakGATTCharacteristic): The characteristic to deactivate
+                notification/indication on.
 
         """
-        if not isinstance(char_specifier, BleakGATTCharacteristic):
-            characteristic = self.services.get_characteristic(char_specifier)
-            if not characteristic:
-                raise BleakCharacteristicNotFoundError(char_specifier)
-        else:
-            characteristic = char_specifier
+        if not self.is_connected:
+            raise BleakError("Not connected")
 
         await characteristic.obj.unsubscribe()
         self._subs.pop(characteristic.handle, None)
