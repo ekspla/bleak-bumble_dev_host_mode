@@ -37,13 +37,17 @@ async def test_service():
     try:
         await client.connect()
         svc_found = False
+        val = None
         for svc in client.services:
             if svc.uuid == svc1.uuid:
                 svc_found = True
-                break
+                for char in svc.characteristics:
+                    if char.uuid == CHAR_UUID:
+                        val = await client.read_gatt_char(char)
+                        assert val == CHAR_VAL
+                        break
         assert svc_found
-        val = await client.read_gatt_char(CHAR_UUID)
-        assert val == CHAR_VAL
+
     finally:
         if client.is_connected:
             await client.disconnect()
