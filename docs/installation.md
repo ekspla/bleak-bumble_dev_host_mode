@@ -10,7 +10,7 @@ To install `bleak_bumble`, you need to install it along with its dependencies.
 
 ## Installation Options
 
-### Via pip
+### Via pip (Not available at the moment)
 
 ```bash
 pip install bleak_bumble

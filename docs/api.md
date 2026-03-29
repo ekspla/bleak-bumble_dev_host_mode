@@ -60,6 +60,7 @@ Bumble backend implementation for BleakScanner.
 BleakScannerBumble(
     detection_callback: Optional[AdvertisementDataCallback] = None,
     service_uuids: Optional[List[str]] = None,
+    scanning_mode: Literal["active", "passive"] = "active",
     cfg: Optional[BumbleTransportCfg] = None,
     host_mode: bool = False,
     **kwargs
@@ -108,28 +109,34 @@ BleakClientBumble(
 
 **Methods:**
 
-#### `connect(**kwargs) -> bool`
+#### `connect(**kwargs) -> None`
 Connect to the device.
 
-#### `disconnect() -> bool`
+#### `disconnect() -> None`
 Disconnect from the device.
 
 #### `get_services(**kwargs) -> BleakGATTServiceCollection`
 Get GATT services from the device.
 
-#### `read_gatt_char(char_specifier: Union[BleakGATTCharacteristic, int, str, uuid.UUID]) -> bytearray`
+#### `read_gatt_char(characteristic: BleakGATTCharacteristic) -> bytearray`
 Read from a GATT characteristic.
 
-#### `write_gatt_char(char_specifier: Union[BleakGATTCharacteristic, int, str, uuid.UUID], data: Union[bytes, bytearray, memoryview], response: bool = True) -> None`
+#### `read_gatt_descriptor(descriptor: BleakGATTDescriptor, **kwargs) -> bytearray`
+Read from a GATT descriptor.
+
+#### `write_gatt_char(characteristic: BleakGATTCharacteristic, data: Union[bytes, bytearray, memoryview], response: bool = True) -> None`
 Write to a GATT characteristic.
 
-#### `start_notify(char_specifier: Union[BleakGATTCharacteristic, int, str, uuid.UUID], callback: NotifyCallback) -> None`
+#### `write_gatt_descriptor(descriptor: BleakGATTDescriptor, data: Buffer) -> None`
+Write to a GATT descriptor.
+
+#### `start_notify(characteristic: BleakGATTCharacteristic, callback: NotifyCallback) -> None`
 Start notifications for a characteristic.
 
-#### `stop_notify(char_specifier: Union[BleakGATTCharacteristic, int, str, uuid.UUID]) -> None`
+#### `stop_notify(characteristic: BleakGATTCharacteristic) -> None`
 Stop notifications for a characteristic.
 
-## Utilities Module (`bleak_bumble.utils`)
+## Utilities Module (`bleak_bumble`, `bleak_bumble.utils`)
 
 ### Utility Functions
 
@@ -157,16 +164,57 @@ Callback type for handling characteristic notifications.
 ## Constants
 
 ### Default Values
-- Default timeout: 10.0 seconds
-- Default MTU: 517 bytes
-- Default connection interval: 30ms
+
+#### Default BD Device address  
+ - `bleak_bumble.scanner`  
+``` Python
+SCANNER_BD_ADDR = "F0:F1:F2:F3:F4:F5"
+```
+ - `bleak_bumble.client`  
+``` Python
+CLIENT_BD_ADDR = "F0:F1:F2:F3:F4:F5"
+```
+
+#### Default Timeouts  
+   - Maximum time to wait for a connection to be established  
+`bumble.device`  
+``` Python
+DEVICE_DEFAULT_CONNECT_TIMEOUT                = None  # No timeout
+```
+`bleak.backends.client.BaseBleakClient`
+``` Python
+        timeout (float): Timeout for required ``discover`` call. Defaults to 10.0.
+```
+
+   - Connection Supervision Timeout  
+`bumble.device`
+``` Python
+DEVICE_DEFAULT_CONNECTION_SUPERVISION_TIMEOUT = 720  # ms
+```
+
+   - HCI Command Timeout  
+`bumble.device.Device.with_hci`
+``` Python
+        self.command_timeout = 10  # seconds
+```
+
+#### Default MTU  
+`bumble.att`
+```
+ATT_DEFAULT_MTU = 23
+```
+
+#### Default Connection Intervals  
+`bumble.device`
+``` Python
+DEVICE_DEFAULT_CONNECTION_INTERVAL_MIN        = 15  # ms
+DEVICE_DEFAULT_CONNECTION_INTERVAL_MAX        = 30  # ms
+```
 
 ## Error Handling
 
 The backend raises standard Bleak exceptions:
 - `BleakError` - General Bleak errors
-- `BleakDeviceNotFoundError` - Device not found
-- `BleakDBusError` - Backend communication errors
 
 ## Environment Variables
 
@@ -176,6 +224,7 @@ Format: `scheme:arguments`
 Examples:
 - `tcp-server:127.0.0.1:1000`
 - `serial:/dev/ttyUSB0`
+- `usb:0`
 - `android-netsim:`
 - `vhci:`
 

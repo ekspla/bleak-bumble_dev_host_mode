@@ -61,7 +61,8 @@ from bleak_bumble.scanner import BleakScannerBumble
 from bleak_bumble.client import BleakClientBumble
 
 # Create serial transport configuration
-cfg = BumbleTransportCfg(TransportScheme.SERIAL, "/dev/ttyUSB0")
+cfg = BumbleTransportCfg(TransportScheme.SERIAL, "/dev/ttyUSB0") # For HCI H4 device
+#cfg = BumbleTransportCfg(TransportScheme.USB, "0") # For HCI H2 device
 
 # Enable host mode for physical controllers
 scanner = BleakScanner(backend=BleakScannerBumble, cfg=cfg, host_mode=True)
