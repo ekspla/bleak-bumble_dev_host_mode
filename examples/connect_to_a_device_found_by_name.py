@@ -9,7 +9,7 @@ Only very few modification is necessary to use this backend.
 # Set environment variables.  This part can be outside of the code.
 import os
 # A virtual controller on TCP.
-#os.environ["BLEAK_BUMBLE"] = "tcp_server:127.0.0.1:1000"
+#os.environ["BLEAK_BUMBLE"] = "tcp-server:127.0.0.1:1000"
 #
 # An HCI H4 on serial port, should be detached from BT stack built in OS.
 #os.environ["BLEAK_BUMBLE"] = "serial:/dev/ttyUSB0,1000000,rtscts"
