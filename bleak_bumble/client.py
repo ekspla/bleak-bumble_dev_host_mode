@@ -18,7 +18,7 @@ from bleak.backends.characteristic import BleakGATTCharacteristic
 from bleak.backends.client import BaseBleakClient, NotifyCallback
 from bleak.backends.device import BLEDevice
 from bleak.backends.service import BleakGATTService, BleakGATTServiceCollection
-from bleak.exc import BleakCharacteristicNotFoundError, BleakError
+from bleak.exc import BleakError
 from bumble.controller import Controller
 from bumble.core import TimeoutError
 from bumble.device import Connection, Device, Peer
