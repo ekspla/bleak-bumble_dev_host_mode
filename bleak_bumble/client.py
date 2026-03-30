@@ -134,9 +134,7 @@ class BleakClientBumble(BaseBleakClient):
         """
         await sleep(1) # Avoid race condition with the delay.
         if self._dev and self._connection:
-            await self._dev.disconnect(
-                self._connection, HCI_REMOTE_USER_TERMINATED_CONNECTION_ERROR
-            )
+            await self._connection.disconnect()
 
         # The transport must be closed in host_mode.
         if self._host_mode:
