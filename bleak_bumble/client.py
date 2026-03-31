@@ -20,7 +20,7 @@ from bleak.backends.device import BLEDevice
 from bleak.backends.service import BleakGATTService, BleakGATTServiceCollection
 from bleak.exc import BleakError
 from bumble.controller import Controller
-from bumble.core import TimeoutError
+from bumble.core import TimeoutError, UUID
 from bumble.device import Connection, Device, Peer
 from bumble.hci import Address, HCI_REMOTE_USER_TERMINATED_CONNECTION_ERROR
 from bumble.host import Host
@@ -76,6 +76,14 @@ class BleakClientBumble(BaseBleakClient):
         self._host_mode: Final[bool] = kwargs.get(
             "host_mode", is_host_mode_enabled_from_env()
         )
+        # Store the peer name in BLEDevice if exists
+        self._name: str = ''
+        if (
+            isinstance(address_or_ble_device, BLEDevice)
+            and
+            address_or_ble_device.name
+        ):
+            self._name = str(address_or_ble_device.name)
 
     @property
     @override
@@ -115,13 +123,15 @@ class BleakClientBumble(BaseBleakClient):
         except TimeoutError:
             # The transport must be closed in host_mode.
             if self._host_mode:
-                transport = transports.pop(str(self._cfg))
-                await transport.close()
+                transport = transports.pop(str(self._cfg), None)
+                if transport is not None:
+                    await transport.close()
                 await sleep(1) # Wait for stabilization.
             logger.debug("Connection timed out")
 
         if self._connection:
             self.services: BleakGATTServiceCollection = await self.get_services()
+            self._name = await self._get_peer_name()
         return None
 
     @override
@@ -138,8 +148,9 @@ class BleakClientBumble(BaseBleakClient):
 
         # The transport must be closed in host_mode.
         if self._host_mode:
-            transport = transports.pop(str(self._cfg))
-            await transport.close()
+            transport = transports.pop(str(self._cfg), None)
+            if transport is not None:
+                await transport.close()
             self._dev = None
             await sleep(1) # Wait for stabilization.
         return None
@@ -170,6 +181,32 @@ class BleakClientBumble(BaseBleakClient):
 
         """
         return bool(self._connection)
+
+    @property
+    @override
+    def name(self) -> str:
+        if not self._peer:
+            raise BleakError("Not connected")
+        return self._name
+
+    async def _get_peer_name(self) -> str:
+        if not self._peer:
+            raise BleakError("Not connected")
+
+        # Read Device Name in Generic Access Service
+        name = ''
+        try: 
+            char_vals = await self._peer.read_characteristics_by_uuid(
+                UUID('00002a00-0000-1000-8000-00805f9b34fb'))
+            name = char_vals[0].decode('utf8')
+        except:
+            pass
+        # If Device Name is not available, use peer address. 
+        if not (self._name or name):
+            name = self._peer.connection.peer_address.to_string(
+                with_type_qualifier=False).replace(':', '-')
+
+        return name if name else self._name
 
     async def get_services(self, **kwargs) -> BleakGATTServiceCollection:
         """Get all services registered for this GATT server.
