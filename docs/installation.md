@@ -5,12 +5,12 @@ To install `bleak_bumble`, you need to install it along with its dependencies.
 ## Requirements
 
 - Python >= 3.9
-- bleak >= 1.0.0, < 1.1.0
-- bumble == 0.0.211
+- bleak >= 1.0.0, <= 1.1.1
+- bumble == 0.0.219
 
 ## Installation Options
 
-### Via pip (Not available at the moment)
+### Via pip (Not available from PyPI at the moment)
 
 ```bash
 pip install bleak_bumble

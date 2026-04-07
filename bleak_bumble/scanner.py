@@ -206,9 +206,9 @@ class BleakScannerBumble(BaseBleakScanner):
         await self._dev.stop_scanning()
         # The transport must be closed in host_mode.
         if self._host_mode:
-                transport = transports.pop(str(self._cfg), None)
-                if transport is not None:
-                    await transport.close()
+            transport = transports.pop(str(self._cfg), None)
+            if transport is not None:
+                await transport.close()
         await self._dev.power_off()
         await sleep(1) # Wait for stabilization.
         self._dev = None
