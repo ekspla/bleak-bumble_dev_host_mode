@@ -10,6 +10,7 @@ from typing import Tuple
 
 import pytest
 from bleak.backends.scanner import AdvertisementData, BLEDevice
+from bumble import data_types
 from bumble.device import AdvertisingData, AdvertisingType
 
 from bleak_bumble.scanner import BleakScannerBumble
@@ -30,13 +31,11 @@ async def test_adv_data():
 
     scan_dev = get_device(ADV_PARAMS["addr"])
     adv_name_data = AdvertisingData(
-        [(AdvertisingData.COMPLETE_LOCAL_NAME, ADV_PARAMS["name"].encode("utf-8"))]
+        [data_types.CompleteLocalName(ADV_PARAMS["name"]), ]
     )
 
     await scan_dev.power_on()
     await scan_dev.start_advertising(
-        advertising_type=AdvertisingType.UNDIRECTED,
-        target=None,
         advertising_data=bytes(adv_name_data),
     )
 

@@ -32,6 +32,7 @@ async def test_service():
     conn_dev = get_device(CONN_ADDR)
     conn_dev.add_services([svc1])
     await conn_dev.power_on()
+    await conn_dev.start_advertising()
 
     client = BleakClientBumble(CONN_ADDR, cfg=test_transport)
     try:
