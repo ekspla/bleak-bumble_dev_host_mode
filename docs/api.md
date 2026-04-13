@@ -57,10 +57,11 @@ Bumble backend implementation for BleakScanner.
 
 **Constructor:**
 ```python
-BleakScannerBumble(
+BleakScanner(
     detection_callback: Optional[AdvertisementDataCallback] = None,
     service_uuids: Optional[List[str]] = None,
     scanning_mode: Literal["active", "passive"] = "active",
+    backend=BleakScannerBumble,
     cfg: Optional[BumbleTransportCfg] = None,
     host_mode: bool = False,
     **kwargs
@@ -93,8 +94,9 @@ Bumble backend implementation for BleakClient.
 
 **Constructor:**
 ```python
-BleakClientBumble(
+BleakClient(
     address_or_ble_device: Union[BLEDevice, str],
+    backend=BleakClientBumble,
     cfg: Optional[BumbleTransportCfg] = None,
     host_mode: bool = False,
     **kwargs

@@ -7,7 +7,6 @@ BLE Client for Bumble
 from asyncio import sleep
 import logging
 import sys
-import uuid
 import warnings
 from functools import partial
 from typing import Dict, Final, Optional, Union
@@ -22,7 +21,7 @@ from bleak.exc import BleakError
 from bumble.controller import Controller
 from bumble.core import TimeoutError, UUID
 from bumble.device import Connection, Device, Peer
-from bumble.hci import Address, HCI_REMOTE_USER_TERMINATED_CONNECTION_ERROR
+from bumble.hci import Address
 from bumble.host import Host
 
 from bleak_bumble import (
@@ -103,7 +102,7 @@ class BleakClientBumble(BaseBleakClient):
         if pair:
             logger.debug("Explicit pairing is not implemented in Bumble backend.")
 
-        timeout = kwargs.get("timeout", self._timeout)
+        timeout = self._timeout
         transport = await start_transport(self._cfg, self._host_mode)
         if not self._host_mode:
             self._dev = Device("client")

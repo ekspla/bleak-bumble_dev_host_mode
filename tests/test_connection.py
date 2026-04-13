@@ -6,7 +6,7 @@
 
 import pytest
 from bumble.gatt import Characteristic, Service
-
+from bleak import BleakClient
 from bleak_bumble.client import BleakClientBumble
 from tests.test_utils import get_device, test_transport
 
@@ -32,8 +32,9 @@ async def test_service():
     conn_dev = get_device(CONN_ADDR)
     conn_dev.add_services([svc1])
     await conn_dev.power_on()
+    await conn_dev.start_advertising()
 
-    client = BleakClientBumble(CONN_ADDR, cfg=test_transport)
+    client = BleakClient(CONN_ADDR, backend=BleakClientBumble, cfg=test_transport)
     try:
         await client.connect()
         svc_found = False
