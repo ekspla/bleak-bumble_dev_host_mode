@@ -9,7 +9,7 @@ This example demonstrates how to use the Bumble backend with a TCP server transp
 
 import asyncio
 import logging
-
+from bleak import BleakScanner
 from bleak_bumble import BumbleTransportCfg, TransportScheme
 from bleak_bumble.scanner import BleakScannerBumble
 
@@ -32,7 +32,11 @@ async def scan_for_devices():
         print("---")
 
     # Create scanner with Bumble backend
-    scanner = BleakScannerBumble(detection_callback=detection_callback, cfg=cfg)
+    scanner = BleakScanner(
+        detection_callback=detection_callback, 
+        backend=BleakScannerBumble, 
+        cfg=cfg
+    )
 
     print("Starting BLE scan with Bumble backend...")
     print("Make sure you have a Bumble-compatible device or simulator running")
