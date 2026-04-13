@@ -102,6 +102,7 @@ A minimal example for device discovery:
 
 ```python
 import asyncio
+from bleak import BleakScanner
 from bleak_bumble import BumbleTransportCfg, TransportScheme
 from bleak_bumble.scanner import BleakScannerBumble
 
@@ -111,8 +112,9 @@ async def scan_for_devices():
     async def detection_callback(device, advertisement_data):
         print(f"Found device: {device.name} ({device.address})")
     
-    scanner = BleakScannerBumble(
+    scanner = BleakScanner(
         detection_callback=detection_callback,
+        backend=BleakScannerBumble,
         cfg=cfg
     )
     

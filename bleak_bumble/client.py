@@ -102,7 +102,7 @@ class BleakClientBumble(BaseBleakClient):
         if pair:
             logger.debug("Explicit pairing is not implemented in Bumble backend.")
 
-        timeout = kwargs.get("timeout", self._timeout)
+        timeout = self._timeout
         transport = await start_transport(self._cfg, self._host_mode)
         if not self._host_mode:
             self._dev = Device("client")

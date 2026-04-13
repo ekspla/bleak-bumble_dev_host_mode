@@ -9,6 +9,7 @@ from asyncio import Queue
 from typing import Tuple
 
 import pytest
+from bleak import BleakScanner
 from bleak.backends.scanner import AdvertisementData, BLEDevice
 from bumble import data_types
 from bumble.device import AdvertisingData, AdvertisingType
@@ -39,10 +40,11 @@ async def test_adv_data():
         advertising_data=bytes(adv_name_data),
     )
 
-    scanner = BleakScannerBumble(
+    scanner = BleakScanner(
         detection_callback=adv_cb,
         service_uuids=None,
         scanning_mode="active",
+        backend=BleakScannerBumble,
         cfg=test_transport,
     )
 
