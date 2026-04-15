@@ -87,6 +87,7 @@ class BleakClientBumble(BaseBleakClient):
     @property
     @override
     def mtu_size(self) -> int:
+        """Get ATT MTU size for active connection."""
         if not self._connection:
             raise BleakError("Not connected")
         return self._connection.att_mtu
@@ -114,6 +115,7 @@ class BleakClientBumble(BaseBleakClient):
             )
         self._dev.on("connection", self.on_connection)
  
+        logger.debug("Connecting to device @ %s", self.address)
         if self._dev.is_scanning:
             await self._dev.stop_scanning()
         await self._dev.power_on()
@@ -143,8 +145,11 @@ class BleakClientBumble(BaseBleakClient):
 
         """
         await sleep(1) # Avoid race condition with the delay.
+        logger.debug("Disconnecting from BLE device")
         if self._dev and self._connection:
             await self._connection.disconnect()
+        else:
+            logger.debug("already disconnected")
 
         # The transport must be closed in host_mode.
         if self._host_mode:
@@ -185,11 +190,20 @@ class BleakClientBumble(BaseBleakClient):
     @property
     @override
     def name(self) -> str:
+        """See :meth:`bleak.BleakClient.name`."""
         if not self._peer:
             raise BleakError("Not connected")
         return self._name
 
     async def _get_peer_name(self) -> str:
+        """A helper function to obtain the name
+
+        `self._name`, obtained before connection 
+        if `isinstance(address_or_ble_device, BLEDevice) and address_or_ble_device.name`, 
+        would be updated by reading `Device Name` characteristic.
+
+        A formatted BLE address would be used if, at all, failed in obtaining the name.
+        """
         if not self._peer:
             raise BleakError("Not connected")
 
