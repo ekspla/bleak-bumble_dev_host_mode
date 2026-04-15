@@ -17,7 +17,7 @@ from bleak.backends.characteristic import BleakGATTCharacteristic
 from bleak.backends.client import BaseBleakClient, NotifyCallback
 from bleak.backends.device import BLEDevice
 from bleak.backends.service import BleakGATTService, BleakGATTServiceCollection
-from bleak.exc import BleakError
+from bleak.exc import BleakDeviceNotFoundError, BleakError
 from bumble.controller import Controller
 from bumble.core import TimeoutError, UUID
 from bumble.device import Connection, Device, Peer
@@ -127,6 +127,7 @@ class BleakClientBumble(BaseBleakClient):
                     await _transport.close()
                 await sleep(1) # Wait for stabilization.
             logger.debug("Connection timed out")
+            raise BleakDeviceNotFoundError("The device was not found.")
 
         if self._connection:
             self.services: BleakGATTServiceCollection = await self.get_services()
@@ -314,6 +315,9 @@ class BleakClientBumble(BaseBleakClient):
             data: The data to send.
             response: If write-with-response operation should be done.
         """
+        if not self.is_connected:
+            raise BleakError("Not connected")
+
         await characteristic.obj.write_value(data, with_response=response)
         logger.debug(f"Write Characteristic {characteristic.uuid} : {data}")
 
@@ -391,4 +395,6 @@ class BleakClientBumble(BaseBleakClient):
 
     def on_disconnection(self, reason):
         self._connection = None
+        if self._disconnected_callback:
+            self._disconnected_callback()
         self._subs = {}
