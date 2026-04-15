@@ -162,11 +162,15 @@ class BleakScannerBumble(BaseBleakScanner):
 
     def on_advertisement(self, advertisement: Advertisement):
         local_name = get_local_name(advertisement)
+        if not self.is_allowed_uuid(
+            uuids := get_service_uuids(advertisement)
+        ):
+            return
         advertisement_data = AdvertisementData(
             local_name=local_name,
             manufacturer_data=get_manuf_data(advertisement),
             service_data=get_service_data(advertisement),
-            service_uuids=get_service_uuids(advertisement),
+            service_uuids=uuids,
             tx_power=advertisement.tx_power,
             rssi=advertisement.rssi,
             platform_data=(None, None),
