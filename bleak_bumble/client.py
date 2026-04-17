@@ -124,10 +124,7 @@ class BleakClientBumble(BaseBleakClient):
         except TimeoutError:
             # The transport must be closed in host_mode.
             if self._host_mode:
-                _transport = transports.pop(str(self._cfg), None)
-                if _transport is not None:
-                    await _transport.close()
-                await sleep(1) # Wait for stabilization.
+                await self._close_transport()
             logger.debug("Connection timed out")
             raise BleakDeviceNotFoundError("The device was not found.")
 
@@ -153,12 +150,15 @@ class BleakClientBumble(BaseBleakClient):
 
         # The transport must be closed in host_mode.
         if self._host_mode:
-            transport = transports.pop(str(self._cfg), None)
-            if transport is not None:
-                await transport.close()
-            self._dev = None
-            await sleep(1) # Wait for stabilization.
+            await self._close_transport()
         return None
+
+    async def _close_transport(self) -> None:
+        transport = transports.pop(str(self._cfg), None)
+        if transport is not None:
+            await transport.close()
+            await sleep(1) # Wait for stabilization.
+        self._dev = None
 
     @override
     async def pair(self, *args, **kwargs) -> None:
