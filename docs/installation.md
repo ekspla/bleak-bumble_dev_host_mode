@@ -5,8 +5,8 @@ To install `bleak_bumble`, you need to install it along with its dependencies.
 ## Requirements
 
 - Python >= 3.10
-- bleak == 2.1.1
-- bumble == 0.0.226
+- bleak == 3.0.1
+- bumble == 0.0.227
 
 ## Installation Options
 
