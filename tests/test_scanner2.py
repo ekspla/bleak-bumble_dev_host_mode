@@ -7,6 +7,7 @@ import pytest
 from bumble import data_types
 from bumble.core import UUID
 from bumble.device import Device
+from bumble.hci import HCI_LE_Extended_Advertising_Report_Event
 
 from bleak import BleakScanner
 from bleak.backends.device import BLEDevice
@@ -97,7 +98,9 @@ async def test_adv_data_simple(bumble_peripheral: Device):
     assert found_adv_data.manufacturer_data == {}
     assert found_adv_data.service_data == {}
     assert found_adv_data.service_uuids == []
-    #assert found_adv_data.tx_power is None # TODO: FIX ME, always 127
+    assert found_adv_data.tx_power in (
+        None,
+        HCI_LE_Extended_Advertising_Report_Event.TX_POWER_INFORMATION_NOT_AVAILABLE)
     assert found_adv_data.platform_data
 
     # Verify that this value is an integer and not some other
@@ -115,7 +118,7 @@ async def test_adv_data_complex(bumble_peripheral: Device):
         [
             data_types.ManufacturerSpecificData(0x1234, b"MFG"),
             data_types.IncompleteListOf16BitServiceUUIDs([UUID(0x180F)]),
-            #data_types.TxPowerLevel(123), # TODO: FIX ME
+            data_types.TxPowerLevel(123),
             data_types.ServiceData16BitUUID(UUID(0x180F), b"SER"),
         ],
     )
@@ -138,7 +141,9 @@ async def test_adv_data_complex(bumble_peripheral: Device):
         "0000180f-0000-1000-8000-00805f9b34fb": b"SER"
     }
     assert found_adv_data.service_uuids == ["0000180f-0000-1000-8000-00805f9b34fb"]
-    #assert found_adv_data.tx_power == 123 # TODO: FIX ME, always 127
+    assert found_adv_data.tx_power in (
+        123,
+        HCI_LE_Extended_Advertising_Report_Event.TX_POWER_INFORMATION_NOT_AVAILABLE)
     assert found_adv_data.platform_data
 
     # Verify that this value is an integer and not some other
