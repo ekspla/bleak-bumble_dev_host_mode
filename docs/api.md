@@ -78,7 +78,10 @@ BleakScanner(
 **Methods:**
 
 #### `start() -> None`
-Start the scanner.
+Start the scanner.  
+
+`scanning_phys=(hci.HCI_LE_1M_PHY, hci.HCI_LE_CODED_PHY)` and `LE_Extended_Scan` are used, if available. 
+See Bumble's `device.py` for details.  
 
 #### `stop() -> None` 
 Stop the scanner.
