@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bleak_bumble"
-version = "0.0.5"
+version = "0.0.6"
 description = "Bumble transport layer for Bleak - Out-of-tree Bumble backend"
 authors = ["Victor Chavez <vchavezb@protonmail.com>"]
 license = "MIT"

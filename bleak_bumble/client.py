@@ -9,7 +9,7 @@ import logging
 import sys
 import warnings
 from functools import partial
-from typing import Dict, Final, Optional, Union
+from typing import Dict, Final, List, Optional, Union
 
 from bleak import BleakGATTDescriptor
 from bleak.assigned_numbers import gatt_char_props_to_strs
@@ -20,8 +20,8 @@ from bleak.backends.service import BleakGATTService, BleakGATTServiceCollection
 from bleak.exc import BleakDeviceNotFoundError, BleakError
 from bumble.controller import Controller
 from bumble.core import TimeoutError, UUID
-from bumble.device import Connection, Device, Peer
-from bumble.hci import Address
+from bumble.device import Connection, ConnectionParametersPreferences, Device, Peer
+from bumble.hci import Address, Phy, HCI_LE_1M_PHY, HCI_LE_2M_PHY, HCI_LE_CODED_PHY
 from bumble.host import Host
 
 from bleak_bumble import (
@@ -60,6 +60,9 @@ class BleakClientBumble(BaseBleakClient):
             Set to ``True`` to set bumble as an HCI Host. Useful
             for connecting an external HCI controller
             If ``False`` it will be set as a controller.
+        phys:
+            Set to comma separated str of '1m', '2m' and 'coded'.
+            Preferences for the 1M PHY are always set.
 
     """
 
@@ -75,6 +78,24 @@ class BleakClientBumble(BaseBleakClient):
         self._host_mode: Final[bool] = kwargs.get(
             "host_mode", is_host_mode_enabled_from_env()
         )
+
+        # PHYs.
+        self._phys: Optional[List[Phy]] = None
+        phys: Final[str | None] = kwargs.get("phys", None)
+        if phys is not None:
+            self._phys = []
+            elements = phys.lower().split(',')
+            for element in elements:
+                if element == '1m':
+                    self._phys.append(HCI_LE_1M_PHY)
+                elif element == '2m':
+                    self._phys.append(HCI_LE_2M_PHY)
+                elif element == 'coded':
+                    self._phys.append(HCI_LE_CODED_PHY)
+                else:
+                    raise ValueError('invalid PHY name')
+        self._connection_parameters_preferences: dict[Phy, ConnectionParametersPreferences] | None = None
+
         # Store the peer name in BLEDevice if exists
         self._name: str = ''
         if (
@@ -114,13 +135,27 @@ class BleakClientBumble(BaseBleakClient):
                 "client", Address(CLIENT_BD_ADDR), transport.source, transport.sink
             )
         self._dev.on("connection", self.on_connection)
- 
         logger.debug("Connecting to device @ %s", self.address)
         if self._dev.is_scanning:
             await self._dev.stop_scanning()
         await self._dev.power_on()
+
+        # PHYs and their ConnectionParametersPreferences.
+        if self._phys is not None:
+            if self._connection_parameters_preferences is None:
+                self._connection_parameters_preferences = {
+                    phy: ConnectionParametersPreferences.default for phy in self._phys
+                }
+            await self._dev.set_default_phy(tx_phys=self._phys, rx_phys=self._phys)
+        else:
+            self._connection_parameters_preferences = None
+
         try:
-            await self._dev.connect(self.address, timeout=timeout)
+            await self._dev.connect(
+                self.address,
+                connection_parameters_preferences=self._connection_parameters_preferences,
+                timeout=timeout,
+            )
         except TimeoutError:
             # The transport must be closed in host_mode.
             if self._host_mode:

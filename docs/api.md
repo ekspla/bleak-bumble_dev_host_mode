@@ -102,6 +102,7 @@ BleakClient(
     backend=BleakClientBumble,
     cfg: Optional[BumbleTransportCfg] = None,
     host_mode: bool = False,
+    phys: Optional[str] = None,
     **kwargs
 )
 ```
@@ -110,6 +111,8 @@ BleakClient(
 - `address_or_ble_device` - Device to connect to
 - `cfg` - Transport configuration (uses default if None)
 - `host_mode` - Enable HCI host mode
+- `phys` - For supported controllers, set a comma separated string of '1m', '2m' and 'coded'. 
+Preferences for the 1M PHY are always set. See `example/client_change_connection_phy.py` how to use. 
 - `**kwargs` - Additional arguments passed to parent class
 
 **Methods:**
