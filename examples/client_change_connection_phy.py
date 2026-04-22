@@ -7,13 +7,12 @@ and was confirmed to work by using nRF BLE sniffer.
 import asyncio
 
 from bumble import data_types
-from bumble.core import AdvertisingData, DataType
+from bumble.core import AdvertisingData
 from bumble.device import Device
-from bumble.hci import Address, Phy, HCI_LE_1M_PHY, HCI_LE_2M_PHY, HCI_LE_CODED_PHY
+from bumble.hci import Address, HCI_LE_1M_PHY, HCI_LE_2M_PHY, HCI_LE_CODED_PHY
 
 from bleak import BleakClient
 from bleak import BleakScanner
-from bleak._compat import timeout as async_timeout
 from bleak_bumble import start_transport
 from bleak_bumble.client import BleakClientBumble
 from bleak_bumble.scanner import BleakScannerBumble
