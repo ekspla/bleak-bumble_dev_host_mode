@@ -18,6 +18,7 @@ from bleak.backends.client import BaseBleakClient, NotifyCallback
 from bleak.backends.device import BLEDevice
 from bleak.backends.service import BleakGATTService, BleakGATTServiceCollection
 from bleak.exc import BleakDeviceNotFoundError, BleakError
+
 from bumble.controller import Controller
 from bumble.core import TimeoutError, UUID
 from bumble.device import Connection, ConnectionParametersPreferences, Device, Peer
@@ -61,8 +62,8 @@ class BleakClientBumble(BaseBleakClient):
             for connecting an external HCI controller
             If ``False`` it will be set as a controller.
         phys:
-            Set to comma separated str of '1m', '2m' and 'coded'.
-            Preferences for the 1M PHY are always set.
+            Set a comma separated string consisting of '1m', '2m' and 'coded'.
+            Preferences for the default 1M PHY are always set by the backend.
 
     """
 
@@ -79,7 +80,7 @@ class BleakClientBumble(BaseBleakClient):
             "host_mode", is_host_mode_enabled_from_env()
         )
 
-        # PHYs.
+        # Parse PHYs.
         self._phys: Optional[List[Phy]] = None
         phys: Final[str | None] = kwargs.get("phys", None)
         if phys is not None:
@@ -94,9 +95,10 @@ class BleakClientBumble(BaseBleakClient):
                     self._phys.append(HCI_LE_CODED_PHY)
                 else:
                     raise ValueError('invalid PHY name')
-        self._connection_parameters_preferences: dict[Phy, ConnectionParametersPreferences] | None = None
+        self._connection_parameters_preferences: (
+            Dict[Phy, ConnectionParametersPreferences] | None) = None
 
-        # Store the peer name in BLEDevice if exists
+        # Use stored peer name in BLEDevice if exists
         self._name: str = ''
         if (
             isinstance(address_or_ble_device, BLEDevice)
@@ -140,7 +142,7 @@ class BleakClientBumble(BaseBleakClient):
             await self._dev.stop_scanning()
         await self._dev.power_on()
 
-        # PHYs and their ConnectionParametersPreferences.
+        # Set up PHYs and their ConnectionParametersPreferences.
         if self._phys is not None:
             if self._connection_parameters_preferences is None:
                 self._connection_parameters_preferences = {
@@ -238,6 +240,10 @@ class BleakClientBumble(BaseBleakClient):
         would be updated by reading `Device Name` characteristic.
 
         A formatted BLE address would be used if, at all, failed in obtaining the name.
+
+        Returns:
+            (str) The peer name or a formatted BLE address of the peer.
+
         """
         if not self._peer:
             raise BleakError("Not connected")
