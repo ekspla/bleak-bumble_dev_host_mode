@@ -11,6 +11,7 @@ This directory contains the documentation for `bleak_bumble`, an out-of-tree Bum
 
 ## Quick Links
 
-- [GitHub Repository](https://github.com/vChavezB/bleak-bumble)
+- [Original GitHub Repository](https://github.com/vChavezB/bleak-bumble)
+- [This fork in GitHub](https://github.com/ekspla/bleak-bumble_dev_host_mode)
 - [Bumble Project](https://github.com/google/bumble)
 - [Bleak Project](https://github.com/hbldh/bleak)

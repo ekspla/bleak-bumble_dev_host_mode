@@ -1,6 +1,6 @@
 # Installation
 
-To install `bleak_bumble`, you need to install it along with its dependencies.
+To install `bleak_bumble` of this fork, you need to install it along with its dependencies.
 
 ## Requirements
 
@@ -13,18 +13,12 @@ To install `bleak_bumble`, you need to install it along with its dependencies.
 ### Via pip (Not available from PyPI at the moment)
 
 ```bash
-pip install bleak_bumble
+pip install -e git+https://github.com/ekspla/bleak-bumble_dev_host_mode.git#egg=bleak_bumble
 ```
 
 ### Development Installation
 
-To install for development:
-
-```bash
-git clone https://github.com/vChavezB/bleak-bumble
-cd bleak-bumble
-pip install -e .
-```
+To install for development, `git clone` or download an archive from GitHub.  
 
 ### Using Poetry
 

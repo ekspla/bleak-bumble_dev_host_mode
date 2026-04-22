@@ -1,5 +1,7 @@
 # bleak_bumble
 
+This is a fork/modified version of [vChavezB/bleak-bumble](https://github.com/vChavezB/bleak-bumble).  
+
 `bleak_bumble` provides a [Bumble](https://github.com/google/bumble) backend for [Bleak](https://github.com/hbldh/bleak) that enables:
 
 - **Hardware-independent Bluetooth LE support**: Use HCI Controllers (e.g. serial/USB) that are not supported natively by your OS
@@ -11,7 +13,7 @@
 ## Installation
 
 ```bash
-pip install -e git+https://github.com/vChavezB/bleak-bumble.git#egg=bleak_bumble
+pip install -e git+https://github.com/ekspla/bleak-bumble_dev_host_mode.git#egg=bleak_bumble
 ```
 
 ## Quick Start
