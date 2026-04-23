@@ -409,6 +409,11 @@ class BleakClientBumble(BaseBleakClient):
         """
         Activate notifications/indications on a characteristic.
 
+        Keyword Args:
+            force_indicate (bool): If this is set to True, then Bleak will set up 
+                a indication request instead of a notification request, given that 
+                the characteristic supports notifications as well as indications.
+
         Implementers should call the OS function to enable notifications or
         indications on the characteristic.
 
@@ -418,11 +423,13 @@ class BleakClientBumble(BaseBleakClient):
         if not self.is_connected:
             raise BleakError("Not connected")
 
+        prefer_notify = not kwargs.get("force_indicate", False)
         if not self._subs.get(characteristic.handle):
             self._subs[characteristic.handle] = []
         self._subs[characteristic.handle].append(callback)
         await characteristic.obj.subscribe(
-            partial(self.__notify_handler, characteristic)
+            partial(self.__notify_handler, characteristic),
+            prefer_notify = prefer_notify,
         )
 
     @override

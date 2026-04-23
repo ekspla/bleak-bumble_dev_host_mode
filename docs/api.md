@@ -138,8 +138,13 @@ Write to a GATT characteristic.
 #### `write_gatt_descriptor(descriptor: BleakGATTDescriptor, data: Buffer) -> None`
 Write to a GATT descriptor.
 
-#### `start_notify(characteristic: BleakGATTCharacteristic, callback: NotifyCallback) -> None`
-Start notifications for a characteristic.
+#### `start_notify(characteristic: BleakGATTCharacteristic, callback: NotifyCallback, **kwargs) -> None`
+Start notifications for a characteristic.  
+
+- `**kwargs`:
+   - `force_indicate: bool = False`: If this is set to True, then Bleak will set up 
+a indication request instead of a notification request, given that 
+the characteristic supports notifications as well as indications.  
 
 #### `stop_notify(characteristic: BleakGATTCharacteristic) -> None`
 Stop notifications for a characteristic.
