@@ -81,7 +81,8 @@ BleakScanner(
 Start the scanner.  
 
 `scanning_phys=(hci.HCI_LE_1M_PHY, hci.HCI_LE_CODED_PHY)` and `LE_Extended_Scan` are used, if available. 
-See Bumble's `device.py` for details.  
+See Bumble's `device.py` for details. A demonstrative example is shown in 
+`[examples/le_ext_adv_scanner.py](https://github.com/ekspla/bleak-bumble_dev_host_mode/blob/main/examples/le_ext_adv_scanner.py)`  
 
 #### `stop() -> None` 
 Stop the scanner.
@@ -112,7 +113,9 @@ BleakClient(
 - `cfg` - Transport configuration (uses default if None)
 - `host_mode` - Enable HCI host mode
 - `phys` - For supported controllers, set a comma separated string of '1m', '2m' and 'coded'. 
-Preferences for the 1M PHY are always set. See `example/client_change_connection_phy.py` how to use. 
+Preferences for the 1M PHY are always set. See 
+`[examples/client_change_connection_phy.py](https://github.com/ekspla/bleak-bumble_dev_host_mode/blob/main/examples/client_change_connection_phy.py)` 
+how to use. 
 - `**kwargs` - Additional arguments passed to parent class
 
 **Methods:**
