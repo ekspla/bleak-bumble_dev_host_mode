@@ -5,7 +5,8 @@ This is a fork/modified version of [vChavezB/bleak-bumble](https://github.com/vC
 `bleak_bumble` provides a [Bumble](https://github.com/google/bumble) backend for [Bleak](https://github.com/hbldh/bleak) that enables:
 
 - **Hardware-independent Bluetooth LE support**: Use HCI Controllers (e.g. serial/USB) that are not supported natively by your OS
-- **Independent of OS's Bluetooth stack**: Linux/MacOS/Windows; e.g. the same code works on the latest Linux and on the obsolete Windows 7sp1 (BLE not supported natively)
+- **Independent of OS's Bluetooth stack**: Linux/MacOS/Windows; e.g. the same code works on the latest Linux and 
+[on the obsolete Windows 7sp1(https://github.com/ekspla/xoss_sync#bleak-bumble) (BLE not supported natively)
 - **Detailed control of parameters**: Change of parameters (`connection interval`, `att mtu`, `data length`, `connection PHYs`, etc.) using Bumble's API
 - **Virtual Bluetooth testing**: Perform Bluetooth functional tests without physical hardware using virtual Bluetooth stacks like Android Emulator and Zephyr RTOS  
 - **Cross-network connections**: Connect HCI Controllers that are not in the same radio network (virtual or physical)
