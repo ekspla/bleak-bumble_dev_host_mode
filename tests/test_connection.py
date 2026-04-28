@@ -7,6 +7,7 @@
 import pytest
 from bumble.gatt import Characteristic, Service
 from bleak import BleakClient
+from bleak.exc import BleakError
 from bleak_bumble.client import BleakClientBumble
 from tests.test_utils import get_device, test_transport
 
@@ -35,20 +36,38 @@ async def test_service():
     await conn_dev.start_advertising()
 
     client = BleakClient(CONN_ADDR, backend=BleakClientBumble, cfg=test_transport)
-    try:
-        await client.connect()
-        svc_found = False
-        val = None
-        for svc in client.services:
-            if svc.uuid == svc1.uuid:
-                svc_found = True
-                for char in svc.characteristics:
-                    if char.uuid == CHAR_UUID:
-                        val = await client.read_gatt_char(char)
-                        assert val == CHAR_VAL
-                        break
-        assert svc_found
+    await client.connect()
+    svc_found = False
+    val = None
+    for svc in (client_services := client.services):
+        if svc.uuid == svc1.uuid:
+            svc_found = True
+            for char in svc.characteristics:
+                if char.uuid == CHAR_UUID:
+                    val = await client.read_gatt_char(char)
+                    assert val == CHAR_VAL
+                    break
+    assert svc_found
+    assert (await client._backend.get_services()) == client_services # Check cache.
 
-    finally:
-        if client.is_connected:
-            await client.disconnect()
+    await client.disconnect()
+
+    assert not client.is_connected
+    mtu_size = start_notify = stop_notify = False
+    try:
+        client.mtu_size
+    except BleakError:
+        mtu_size = True
+    assert mtu_size
+    try:
+        async def callback(char, data):
+            pass
+        await client.start_notify(CHAR_UUID, callback=callback)
+    except BleakError:
+        start_notify = True
+    assert start_notify
+    try:
+        await client.stop_notify(CHAR_UUID)
+    except BleakError:
+        stop_notify = True
+    assert stop_notify
