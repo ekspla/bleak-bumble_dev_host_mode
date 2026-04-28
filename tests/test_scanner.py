@@ -21,7 +21,8 @@ ADV_PARAMS = {"name": "scan_dev", "addr": "12:34:56:78:AB:CD"}
 
 
 @pytest.mark.asyncio
-async def test_adv_data():
+@pytest.mark.parametrize("is_complete_local_name", [True, False])
+async def test_adv_data(is_complete_local_name: bool):
     """Test to validate that advertisement data can be detected correctly."""
     # Create a fresh queue for each test to avoid race conditions
     adv_data_queue: Queue[Tuple[BLEDevice, AdvertisementData]] = Queue()
@@ -32,7 +33,10 @@ async def test_adv_data():
 
     scan_dev = get_device(ADV_PARAMS["addr"])
     adv_name_data = AdvertisingData(
-        [data_types.CompleteLocalName(ADV_PARAMS["name"]), ]
+        [data_types.CompleteLocalName(ADV_PARAMS["name"]),]
+        if is_complete_local_name
+        else
+        [data_types.ShortenedLocalName(ADV_PARAMS["name"]),]
     )
 
     await scan_dev.power_on()
