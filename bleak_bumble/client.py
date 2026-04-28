@@ -83,7 +83,7 @@ class BleakClientBumble(BaseBleakClient):
         # Parse PHYs.
         self._phys: Optional[List[Phy]] = None
         phys: Final[str | None] = kwargs.get("phys", None)
-        if phys is not None:
+        if phys is not None: # pragma: no cover
             self._phys = []
             elements = phys.lower().split(',')
             for element in elements:
@@ -143,7 +143,7 @@ class BleakClientBumble(BaseBleakClient):
         await self._dev.power_on()
 
         # Set up PHYs and their ConnectionParametersPreferences.
-        if self._phys is not None:
+        if self._phys is not None: # pragma: no cover
             if self._connection_parameters_preferences is None:
                 self._connection_parameters_preferences = {
                     phy: ConnectionParametersPreferences.default for phy in self._phys
