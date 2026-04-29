@@ -6,8 +6,8 @@ authors = ["Victor Chavez <vchavezb@protonmail.com>"]
 license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/vChavezB/bleak-bumble"
-repository = "https://github.com/vChavezB/bleak-bumble"
-documentation = "https://github.com/vChavezB/bleak-bumble/blob/main/README.md"
+repository = "https://github.com/ekspla/bleak-bumble_dev_host_mode"
+documentation = "https://github.com/ekspla/bleak-bumble_dev_host_mode/blob/main/README.md"
 keywords = ["bluetooth", "ble", "bumble", "bleak", "asyncio"]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -25,13 +25,14 @@ classifiers = [
 [tool.poetry.dependencies]
 python = ">=3.10"
 bleak = "3.0.1"
-bumble = "0.0.227"
+bumble = "0.0.228"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"
 isort = "^6.0.1"
 pytest = "^8.4.1"
 pytest-asyncio = "^1.1.0"
+pytest-cov = "^7.0.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -39,7 +40,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-v --tb=short"
+addopts = "-v --tb=short --cov=bleak_bumble --cov-report=term-missing"
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]  
