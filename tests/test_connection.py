@@ -53,21 +53,13 @@ async def test_service():
     await client.disconnect()
 
     assert not client.is_connected
-    mtu_size = start_notify = stop_notify = False
-    try:
+    with pytest.raises(BleakError):
         client.mtu_size
-    except BleakError:
-        mtu_size = True
-    assert mtu_size
-    try:
+
+    with pytest.raises(BleakError):
         async def callback(char, data):
             pass
         await client.start_notify(CHAR_UUID, callback=callback)
-    except BleakError:
-        start_notify = True
-    assert start_notify
-    try:
+
+    with pytest.raises(BleakError):
         await client.stop_notify(CHAR_UUID)
-    except BleakError:
-        stop_notify = True
-    assert stop_notify

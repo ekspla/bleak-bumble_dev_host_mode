@@ -51,7 +51,7 @@ async def test_connect_host_mode():
     _ = await add_pytest_host_transport()
 
     client = BleakClient(
-        CONN_ADDR,
+        device,
         backend=BleakClientBumble,
         cfg="pytest",
         host_mode=True,
