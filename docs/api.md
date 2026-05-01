@@ -145,8 +145,8 @@ Write to a GATT descriptor.
 Start notifications for a characteristic.  
 
 - `**kwargs`:
-   - `force_indicate: bool = False`: If this is set to True, then Bleak will set up 
-a indication request instead of a notification request, given that 
+    - `force_indicate: bool = False`: If this is set to `True`, then Bleak will set up 
+an indication request instead of a notification request, given that 
 the characteristic supports notifications as well as indications.  
 
 #### `stop_notify(characteristic: BleakGATTCharacteristic) -> None`
