@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2024 Victor Chavez <vchavezb@protonmail.com>
 
-from asyncio import sleep
 import logging
 import sys
+from asyncio import sleep
 from typing import Dict, Final, List, Literal, Optional, Tuple
 
 from bleak.backends.scanner import (
@@ -44,7 +44,7 @@ SERVICE_UUID_TYPES: Final[Tuple] = (
 )
 
 # Arbitrary BD_ADDR for the scanner device
-#SCANNER_BD_ADDR = "00:00:00:00:00:00"
+# SCANNER_BD_ADDR = "00:00:00:00:00:00"
 # A static BD_ADDR. Use with suffix '/P' for public (fixed) address.
 SCANNER_BD_ADDR = "F0:F1:F2:F3:F4:F5"
 
@@ -162,9 +162,7 @@ class BleakScannerBumble(BaseBleakScanner):
 
     def on_advertisement(self, advertisement: Advertisement):
         local_name = get_local_name(advertisement)
-        if not self.is_allowed_uuid(
-            uuids := get_service_uuids(advertisement)
-        ):
+        if not self.is_allowed_uuid(uuids := get_service_uuids(advertisement)):
             return
         advertisement_data = AdvertisementData(
             local_name=local_name,
@@ -214,7 +212,7 @@ class BleakScannerBumble(BaseBleakScanner):
             if transport is not None:
                 await transport.close()
         await self._dev.power_off()
-        await sleep(1) # Wait for stabilization.
+        await sleep(1)  # Wait for stabilization.
         self._dev = None
 
     def set_scanning_filter(self, **kwargs) -> None:

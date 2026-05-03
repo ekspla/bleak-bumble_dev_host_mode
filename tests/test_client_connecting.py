@@ -1,18 +1,18 @@
 """Modified version of a test in `bleak.tests.integration`"""
 
 import asyncio
+
 import pytest
-
-from bumble.device import Device
-
 from bleak import BleakClient
 from bleak._compat import timeout as async_timeout
-from bleak_bumble.client import BleakClientBumble
+from bumble.device import Device
 
+from bleak_bumble.client import BleakClientBumble
 from tests.conftest import (
     configure_and_power_on_bumble_peripheral,
     find_ble_device,
 )
+
 
 @pytest.mark.asyncio
 async def test_connect(bumble_peripheral: Device):
@@ -23,6 +23,7 @@ async def test_connect(bumble_peripheral: Device):
 
     async with BleakClient(device, backend=BleakClientBumble) as client:
         assert client.name == bumble_peripheral.name
+
 
 @pytest.mark.asyncio
 async def test_connect_multiple_times(bumble_peripheral: Device):
@@ -39,6 +40,7 @@ async def test_connect_multiple_times(bumble_peripheral: Device):
     async with BleakClient(device, backend=BleakClientBumble):
         pass
 
+
 @pytest.mark.asyncio
 async def test_is_connected(bumble_peripheral: Device):
     """Check if a connection is connected is working."""
@@ -53,6 +55,7 @@ async def test_is_connected(bumble_peripheral: Device):
         assert client.is_connected is True
     assert client.is_connected is False
 
+
 @pytest.mark.asyncio
 async def test_disconnect_callback(bumble_peripheral: Device):
     """Check if disconnect callback is called."""
@@ -65,7 +68,9 @@ async def test_disconnect_callback(bumble_peripheral: Device):
     def disconnected_callback(client: BleakClient):
         disconnected_client_future.set_result(client)
 
-    async with BleakClient(device, disconnected_callback, backend=BleakClientBumble) as client:
+    async with BleakClient(
+        device, disconnected_callback, backend=BleakClientBumble
+    ) as client:
         # Disconnect from virtual device side
         virtual_connection = list(bumble_peripheral.connections.values())[0]
         await virtual_connection.disconnect()

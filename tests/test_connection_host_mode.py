@@ -3,22 +3,21 @@
 
 Although not of great importance, this test checks the `if host_mode==True:` branch.
 """
-import asyncio
-import pytest
 
+import asyncio
+
+import pytest
+from bleak import BleakClient, BleakScanner
 from bumble.controller import Controller
 from bumble.transport.common import Transport
 
-from bleak import BleakClient
-from bleak import BleakScanner
-
-from bleak_bumble import transports, get_link
+from bleak_bumble import get_link, transports
 from bleak_bumble.client import BleakClientBumble
 from bleak_bumble.scanner import BleakScannerBumble
-
 from tests.test_utils import get_device
 
 CONN_ADDR = "12:34:56:78:AB:CD"
+
 
 @pytest.mark.asyncio
 async def test_connect_host_mode():

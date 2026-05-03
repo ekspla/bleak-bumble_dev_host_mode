@@ -1,8 +1,10 @@
 """Modified version of a test in `bleak.tests.integration`"""
 
 import asyncio
-import pytest
 
+import pytest
+from bleak import BleakClient, BleakScanner
+from bleak.backends.characteristic import BleakGATTCharacteristic
 from bumble.att import Attribute, AttributeValue
 from bumble.controller import Controller
 from bumble.device import Connection, Device
@@ -14,17 +16,14 @@ from bumble.gatt import (
 )
 from bumble.host import Host
 
-from bleak import BleakClient, BleakScanner
-from bleak.backends.characteristic import BleakGATTCharacteristic
-
 from bleak_bumble import get_link
 from bleak_bumble.client import BleakClientBumble
 from bleak_bumble.scanner import BleakScannerBumble
-
 from tests.conftest import add_default_advertising_data
 
 TEST_SERVICE_UUID = "9d513f40-5c89-42dc-9688-2cfa30f2d9e7"
 TEST_CHARACTERISTIC_UUID = "e809cb2f-34e3-42a1-ba92-22db2495cd6a"
+
 
 @pytest.mark.asyncio
 @pytest.mark.skipif(True, reason="This does not work on Bumble backend.")
@@ -77,12 +76,16 @@ async def test_notification_sent_before_write_response(
     await bumble_peripheral.start_advertising()
 
     device = await BleakScanner.find_device_by_address(
-        bumble_peripheral.static_address.to_string(), cb={"use_bdaddr": True}, backend=BleakScannerBumble
+        bumble_peripheral.static_address.to_string(),
+        cb={"use_bdaddr": True},
+        backend=BleakScannerBumble,
     )
 
     assert device is not None, "Could not find bumble peripheral device"
 
-    async with BleakClient(device, services=[TEST_SERVICE_UUID], backend=BleakClientBumble) as client:
+    async with BleakClient(
+        device, services=[TEST_SERVICE_UUID], backend=BleakClientBumble
+    ) as client:
         notification_queue: asyncio.Queue[bytes] = asyncio.Queue()
 
         def on_notification(_: BleakGATTCharacteristic, data: bytearray) -> None:

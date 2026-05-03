@@ -1,7 +1,9 @@
 """This is simulating an unusual nameless peripheral which does not advertise name and which lacks gap service."""
-import asyncio
-import pytest
 
+import asyncio
+
+import pytest
+from bleak import BleakClient
 from bumble import data_types
 from bumble.controller import Controller
 from bumble.core import AdvertisingData
@@ -9,10 +11,9 @@ from bumble.device import Device, DeviceConfiguration
 from bumble.hci import Address
 from bumble.host import Host
 
-from bleak import BleakClient
-
 from bleak_bumble import get_link
 from bleak_bumble.client import BleakClientBumble
+
 
 @pytest.mark.asyncio
 async def test_connect_nameless_device():
@@ -22,9 +23,9 @@ async def test_connect_nameless_device():
     device = Device(
         name=None,
         address=address,
-        config = DeviceConfiguration(gap_service_enabled=False),
+        config=DeviceConfiguration(gap_service_enabled=False),
     )
-    device.name = None # This is necessary because `name` defaults to 'Bumble'.
+    device.name = None  # This is necessary because `name` defaults to 'Bumble'.
     adv_data = [
         data_types.Flags(
             AdvertisingData.Flags.LE_GENERAL_DISCOVERABLE_MODE
@@ -39,4 +40,4 @@ async def test_connect_nameless_device():
     bd = address.to_string(with_type_qualifier=False)
 
     async with BleakClient(bd, backend=BleakClientBumble) as client:
-        assert client.name == bd.replace(':', '-')
+        assert client.name == bd.replace(":", "-")

@@ -2,25 +2,25 @@
 
 import asyncio
 import contextlib
-import pytest
 
+import pytest
+from bleak import BleakScanner
+from bleak.backends.device import BLEDevice
+from bleak.backends.scanner import AdvertisementData
+from bleak.uuids import normalize_uuid_str
 from bumble import data_types
 from bumble.core import UUID
 from bumble.device import Device
 from bumble.hci import HCI_LE_Extended_Advertising_Report_Event
 
-from bleak import BleakScanner
-from bleak.backends.device import BLEDevice
-from bleak.backends.scanner import AdvertisementData
-from bleak.uuids import normalize_uuid_str
 from bleak_bumble.scanner import BleakScannerBumble
-
 from tests.conftest import (
     configure_and_power_on_bumble_peripheral,
     find_ble_device,
 )
 
 DEFAULT_TIMEOUT = 5.0
+
 
 @pytest.mark.asyncio
 async def test_discover(bumble_peripheral: Device):
@@ -37,6 +37,7 @@ async def test_discover(bumble_peripheral: Device):
 
     assert len(filtered_devices) == 1
     assert filtered_devices[0][1].local_name == bumble_peripheral.name
+
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("service_uuid_available", [True, False])
@@ -63,7 +64,7 @@ async def test_discover_filter_by_service_uuid(
     async with BleakScanner(
         detection_callback,
         service_uuids=[normalize_uuid_str("180f")],
-        backend=BleakScannerBumble
+        backend=BleakScannerBumble,
     ):
         found_adv_data = None
         with contextlib.suppress(asyncio.TimeoutError):
@@ -76,6 +77,7 @@ async def test_discover_filter_by_service_uuid(
         assert found_adv_data is not None
     else:
         assert found_adv_data is None
+
 
 @pytest.mark.asyncio
 async def test_adv_data_simple(bumble_peripheral: Device):
@@ -100,7 +102,8 @@ async def test_adv_data_simple(bumble_peripheral: Device):
     assert found_adv_data.service_uuids == []
     assert found_adv_data.tx_power in (
         None,
-        HCI_LE_Extended_Advertising_Report_Event.TX_POWER_INFORMATION_NOT_AVAILABLE)
+        HCI_LE_Extended_Advertising_Report_Event.TX_POWER_INFORMATION_NOT_AVAILABLE,
+    )
     assert found_adv_data.platform_data
 
     # Verify that this value is an integer and not some other
@@ -109,6 +112,7 @@ async def test_adv_data_simple(bumble_peripheral: Device):
 
     # The rssi can vary. So we only check for a plausible range.
     assert -127 <= found_adv_data.rssi < 0
+
 
 @pytest.mark.asyncio
 async def test_adv_data_complex(bumble_peripheral: Device):
@@ -143,7 +147,8 @@ async def test_adv_data_complex(bumble_peripheral: Device):
     assert found_adv_data.service_uuids == ["0000180f-0000-1000-8000-00805f9b34fb"]
     assert found_adv_data.tx_power in (
         123,
-        HCI_LE_Extended_Advertising_Report_Event.TX_POWER_INFORMATION_NOT_AVAILABLE)
+        HCI_LE_Extended_Advertising_Report_Event.TX_POWER_INFORMATION_NOT_AVAILABLE,
+    )
     assert found_adv_data.platform_data
 
     # Verify that this value is an integer and not some other

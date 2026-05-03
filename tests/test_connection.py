@@ -5,9 +5,10 @@
 """Tests for `bleak.backends.bumble` package, specifically connection functionality."""
 
 import pytest
-from bumble.gatt import Characteristic, Service
 from bleak import BleakClient
 from bleak.exc import BleakError
+from bumble.gatt import Characteristic, Service
+
 from bleak_bumble.client import BleakClientBumble
 from tests.test_utils import get_device, test_transport
 
@@ -48,7 +49,7 @@ async def test_service():
                     assert val == CHAR_VAL
                     break
     assert svc_found
-    assert (await client._backend.get_services()) == client_services # Check cache.
+    assert (await client._backend.get_services()) == client_services  # Check cache.
 
     await client.disconnect()
 
@@ -57,8 +58,10 @@ async def test_service():
         client.mtu_size
 
     with pytest.raises(BleakError):
+
         async def callback(char, data):
             pass
+
         await client.start_notify(CHAR_UUID, callback=callback)
 
     with pytest.raises(BleakError):

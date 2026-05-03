@@ -1,15 +1,14 @@
 """Modified version of a test in `bleak.tests.integration`"""
 
 import asyncio
-import pytest
 
+import pytest
+from bleak import BleakClient
+from bleak.backends.characteristic import BleakGATTCharacteristic
 from bumble.device import Connection, Device
 from bumble.gatt import Characteristic, CharacteristicValue, Service
 
-from bleak import BleakClient
-from bleak.backends.characteristic import BleakGATTCharacteristic
 from bleak_bumble.client import BleakClientBumble
-
 from tests.conftest import (
     configure_and_power_on_bumble_peripheral,
     find_ble_device,
@@ -34,9 +33,12 @@ async def test_read_gatt_char(bumble_peripheral: Device):
 
     device = await find_ble_device(bumble_peripheral)
 
-    async with BleakClient(device, services=[READ_SERVICE_UUID], backend=BleakClientBumble) as client:
+    async with BleakClient(
+        device, services=[READ_SERVICE_UUID], backend=BleakClientBumble
+    ) as client:
         data = await client.read_gatt_char(READ_CHARACTERISITC_UUID)
         assert data == b"DATA"
+
 
 @pytest.mark.asyncio
 async def test_write_gatt_char_with_response(bumble_peripheral: Device):
@@ -63,6 +65,7 @@ async def test_write_gatt_char_with_response(bumble_peripheral: Device):
             WRITE_WITH_RESPONSE_CHARACTERISITC_UUID, b"DATA", response=True
         )
         assert virtual_characteristic.value == b"DATA"
+
 
 @pytest.mark.asyncio
 async def test_write_gatt_char_no_response(bumble_peripheral: Device):
@@ -91,7 +94,9 @@ async def test_write_gatt_char_no_response(bumble_peripheral: Device):
     device = await find_ble_device(bumble_peripheral)
 
     async with BleakClient(
-        device, services=[WRITE_WITHOUT_RESPONSE_SERVICE_UUID], backend=BleakClientBumble
+        device,
+        services=[WRITE_WITHOUT_RESPONSE_SERVICE_UUID],
+        backend=BleakClientBumble,
     ) as client:
         await client.write_gatt_char(
             WRITE_WITHOUT_RESPONSE_CHARACTERISITC_UUID, b"DATA", response=False
@@ -100,6 +105,7 @@ async def test_write_gatt_char_no_response(bumble_peripheral: Device):
             peripheral_write_callback_called, timeout=1
         )
         assert written_value == b"DATA"
+
 
 @pytest.mark.asyncio
 async def test_notify_gatt_char(bumble_peripheral: Device):
@@ -125,7 +131,9 @@ async def test_notify_gatt_char(bumble_peripheral: Device):
         assert characteristic.uuid.lower() == NOTIFY_CHARACTERISITC_UUID
         notified_data.put_nowait(bytes(data))
 
-    async with BleakClient(device, services=[NOTIFY_SERVICE_UUID],  backend=BleakClientBumble) as client:
+    async with BleakClient(
+        device, services=[NOTIFY_SERVICE_UUID], backend=BleakClientBumble
+    ) as client:
         await client.start_notify(
             NOTIFY_CHARACTERISITC_UUID,
             notify_callback,
@@ -158,4 +166,3 @@ async def test_notify_gatt_char(bumble_peripheral: Device):
         # Verify no notification was received
         with pytest.raises(asyncio.TimeoutError):
             await asyncio.wait_for(notified_data.get(), timeout=1)
-

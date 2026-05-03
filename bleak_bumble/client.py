@@ -4,10 +4,10 @@
 BLE Client for Bumble
 """
 
-from asyncio import sleep
 import logging
 import sys
 import warnings
+from asyncio import sleep
 from functools import partial
 from typing import Dict, Final, List, Optional, Union
 
@@ -18,11 +18,10 @@ from bleak.backends.client import BaseBleakClient, NotifyCallback
 from bleak.backends.device import BLEDevice
 from bleak.backends.service import BleakGATTService, BleakGATTServiceCollection
 from bleak.exc import BleakDeviceNotFoundError, BleakError
-
 from bumble.controller import Controller
-from bumble.core import TimeoutError, UUID
+from bumble.core import UUID, TimeoutError
 from bumble.device import Connection, ConnectionParametersPreferences, Device, Peer
-from bumble.hci import Address, Phy, HCI_LE_1M_PHY, HCI_LE_2M_PHY, HCI_LE_CODED_PHY
+from bumble.hci import HCI_LE_1M_PHY, HCI_LE_2M_PHY, HCI_LE_CODED_PHY, Address, Phy
 from bumble.host import Host
 
 from bleak_bumble import (
@@ -36,11 +35,11 @@ from bleak_bumble import (
 from bleak_bumble.utils import bumble_uuid_to_str
 
 if sys.version_info < (3, 12):
-    from typing_extensions import override as override
     from typing_extensions import Buffer
+    from typing_extensions import override as override
 else:
-    from typing import override as override
     from collections.abc import Buffer
+    from typing import override as override
 
 # A static BD_ADDR. Use with suffix '/P' for public (fixed) address.
 CLIENT_BD_ADDR = "F0:F1:F2:F3:F4:F5"
@@ -83,28 +82,25 @@ class BleakClientBumble(BaseBleakClient):
         # Parse PHYs.
         self._phys: Optional[List[Phy]] = None
         phys: Final[str | None] = kwargs.get("phys", None)
-        if phys is not None: # pragma: no cover
+        if phys is not None:  # pragma: no cover
             self._phys = []
-            elements = phys.lower().split(',')
+            elements = phys.lower().split(",")
             for element in elements:
-                if element == '1m':
+                if element == "1m":
                     self._phys.append(HCI_LE_1M_PHY)
-                elif element == '2m':
+                elif element == "2m":
                     self._phys.append(HCI_LE_2M_PHY)
-                elif element == 'coded':
+                elif element == "coded":
                     self._phys.append(HCI_LE_CODED_PHY)
                 else:
-                    raise ValueError('invalid PHY name')
+                    raise ValueError("invalid PHY name")
         self._connection_parameters_preferences: (
-            Dict[Phy, ConnectionParametersPreferences] | None) = None
+            Dict[Phy, ConnectionParametersPreferences] | None
+        ) = None
 
         # Use stored peer name in BLEDevice if exists
-        self._name: str = ''
-        if (
-            isinstance(address_or_ble_device, BLEDevice)
-            and
-            address_or_ble_device.name
-        ):
+        self._name: str = ""
+        if isinstance(address_or_ble_device, BLEDevice) and address_or_ble_device.name:
             self._name = str(address_or_ble_device.name)
 
     @property
@@ -143,7 +139,7 @@ class BleakClientBumble(BaseBleakClient):
         await self._dev.power_on()
 
         # Set up PHYs and their ConnectionParametersPreferences.
-        if self._phys is not None: # pragma: no cover
+        if self._phys is not None:  # pragma: no cover
             if self._connection_parameters_preferences is None:
                 self._connection_parameters_preferences = {
                     phy: ConnectionParametersPreferences.default for phy in self._phys
@@ -178,7 +174,7 @@ class BleakClientBumble(BaseBleakClient):
             None.
 
         """
-        await sleep(1) # Avoid race condition with the delay.
+        await sleep(1)  # Avoid race condition with the delay.
         logger.debug("Disconnecting from BLE device")
         if self._dev and self._connection:
             await self._connection.disconnect()
@@ -194,7 +190,7 @@ class BleakClientBumble(BaseBleakClient):
         transport = transports.pop(str(self._cfg), None)
         if transport is not None:
             await transport.close()
-            await sleep(1) # Wait for stabilization.
+            await sleep(1)  # Wait for stabilization.
         self._dev = None
 
     @override
@@ -235,8 +231,8 @@ class BleakClientBumble(BaseBleakClient):
     async def _get_peer_name(self) -> str:
         """A helper function to obtain the name
 
-        `self._name`, obtained before connection 
-        if `isinstance(address_or_ble_device, BLEDevice) and address_or_ble_device.name`, 
+        `self._name`, obtained before connection
+        if `isinstance(address_or_ble_device, BLEDevice) and address_or_ble_device.name`,
         would be updated by reading `Device Name` characteristic.
 
         A formatted BLE address would be used if, at all, failed in obtaining the name.
@@ -249,17 +245,19 @@ class BleakClientBumble(BaseBleakClient):
             raise BleakError("Not connected")
 
         # Read Device Name in Generic Access Service
-        name = ''
-        try: 
+        name = ""
+        try:
             char_vals = await self._peer.read_characteristics_by_uuid(
-                UUID('00002a00-0000-1000-8000-00805f9b34fb'))
-            name = char_vals[0].decode('utf8')
+                UUID("00002a00-0000-1000-8000-00805f9b34fb")
+            )
+            name = char_vals[0].decode("utf8")
         except:
             pass
-        # If Device Name is not available, use peer address. 
+        # If Device Name is not available, use peer address.
         if not (self._name or name):
             name = self._peer.connection.peer_address.to_string(
-                with_type_qualifier=False).replace(':', '-')
+                with_type_qualifier=False
+            ).replace(":", "-")
 
         return name if name else self._name
 
@@ -336,7 +334,8 @@ class BleakClientBumble(BaseBleakClient):
 
     @override
     async def read_gatt_descriptor(
-        self, descriptor: BleakGATTDescriptor,
+        self,
+        descriptor: BleakGATTDescriptor,
         **kwargs,
     ) -> bytearray:
         """Perform read operation on the specified GATT descriptor.
@@ -378,9 +377,7 @@ class BleakClientBumble(BaseBleakClient):
 
     @override
     async def write_gatt_descriptor(
-        self,
-        descriptor: BleakGATTDescriptor,
-        data: Buffer
+        self, descriptor: BleakGATTDescriptor, data: Buffer
     ) -> None:
         """Perform a write operation on the specified GATT descriptor.
 
@@ -410,8 +407,8 @@ class BleakClientBumble(BaseBleakClient):
         Activate notifications/indications on a characteristic.
 
         Keyword Args:
-            force_indicate (bool): If this is set to True, then Bleak will set up 
-                a indication request instead of a notification request, given that 
+            force_indicate (bool): If this is set to True, then Bleak will set up
+                a indication request instead of a notification request, given that
                 the characteristic supports notifications as well as indications.
 
         Implementers should call the OS function to enable notifications or
@@ -429,7 +426,7 @@ class BleakClientBumble(BaseBleakClient):
         self._subs[characteristic.handle].append(callback)
         await characteristic.obj.subscribe(
             partial(self.__notify_handler, characteristic),
-            prefer_notify = prefer_notify,
+            prefer_notify=prefer_notify,
         )
 
     @override

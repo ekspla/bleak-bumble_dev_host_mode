@@ -33,10 +33,13 @@ async def test_adv_data(is_complete_local_name: bool):
 
     scan_dev = get_device(ADV_PARAMS["addr"])
     adv_name_data = AdvertisingData(
-        [data_types.CompleteLocalName(ADV_PARAMS["name"]),]
+        [
+            data_types.CompleteLocalName(ADV_PARAMS["name"]),
+        ]
         if is_complete_local_name
-        else
-        [data_types.ShortenedLocalName(ADV_PARAMS["name"]),]
+        else [
+            data_types.ShortenedLocalName(ADV_PARAMS["name"]),
+        ]
     )
 
     await scan_dev.power_on()

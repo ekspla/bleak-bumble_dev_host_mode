@@ -1,23 +1,23 @@
 """Modified version of a test in `bleak.tests.integration`"""
 
 import asyncio
-import pytest
 from typing import TYPE_CHECKING
 
+import pytest
+from bleak import BleakClient
 from bumble.device import Device
 
-from bleak import BleakClient
 from bleak_bumble.client import BleakClientBumble
-
 from tests.conftest import (
     configure_and_power_on_bumble_peripheral,
     find_ble_device,
 )
 
+
 @pytest.mark.asyncio
 @pytest.mark.skipif(
     True,
-    reason="HCI_READ_RSSI_COMMAND is not supported on virtual controller with LocalLink(), use a physical controller.", 
+    reason="HCI_READ_RSSI_COMMAND is not supported on virtual controller with LocalLink(), use a physical controller.",
 )
 async def test_get_rssi(bumble_peripheral: Device):
     """Getting RSSI from client is possible."""
@@ -35,6 +35,7 @@ async def test_get_rssi(bumble_peripheral: Device):
 
         # The rssi can vary. So we only check for a plausible range.
         assert -127 <= rssi < 0
+
 
 @pytest.mark.asyncio
 async def test_mtu_size(bumble_peripheral: Device):

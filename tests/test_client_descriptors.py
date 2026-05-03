@@ -1,8 +1,9 @@
 """Modified version of a test in `bleak.tests.integration`"""
 
 import asyncio
-import pytest
 
+import pytest
+from bleak import BleakClient
 from bumble.device import Device
 from bumble.gatt import (
     GATT_CHARACTERISTIC_USER_DESCRIPTION_DESCRIPTOR,
@@ -11,13 +12,12 @@ from bumble.gatt import (
     Service,
 )
 
-from bleak import BleakClient
 from bleak_bumble.client import BleakClientBumble
-
 from tests.conftest import (
     configure_and_power_on_bumble_peripheral,
     find_ble_device,
 )
+
 
 @pytest.mark.asyncio
 async def test_read_gatt_descriptor(bumble_peripheral: Device):
@@ -58,6 +58,7 @@ async def test_read_gatt_descriptor(bumble_peripheral: Device):
 
         data = await client.read_gatt_descriptor(descriptor)
         assert data == b"Description"
+
 
 @pytest.mark.asyncio
 async def test_write_gatt_descriptor(bumble_peripheral: Device):

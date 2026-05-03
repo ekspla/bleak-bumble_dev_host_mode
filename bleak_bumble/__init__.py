@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2024 Victor Chavez <vchavezb@protonmail.com>
 """Bumble backend."""
+
 import os
 from enum import Enum
 from typing import Dict, Final, Optional
