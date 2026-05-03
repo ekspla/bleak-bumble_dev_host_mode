@@ -2,9 +2,9 @@ name: Tests
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
 
 jobs:
   test:
@@ -31,13 +31,13 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install poetry
+        pip install poetry==2.0.1
         poetry install
     
     - name: Run linters
       run: |
         poetry run black --check bleak_bumble/ tests/
-        poetry run isort --check-only bleak_bumble/ tests/
+        poetry run isort --profile black --check-only bleak_bumble/ tests/
     
     - name: Run tests
       run: |
