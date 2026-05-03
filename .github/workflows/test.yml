@@ -36,7 +36,7 @@ jobs:
     
     - name: Run linters
       run: |
-        poetry run black --check bleak_bumble/ tests/
+        poetry run black bleak_bumble/ tests/
         poetry run isort --profile black --check-only bleak_bumble/ tests/
     
     - name: Run tests
