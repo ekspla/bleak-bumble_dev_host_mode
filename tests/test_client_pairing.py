@@ -4,7 +4,6 @@ import asyncio
 
 import pytest
 from bleak import BleakClient
-from bleak.backends import BleakBackend, get_default_backend
 from bumble.device import Device
 
 from bleak_bumble.client import BleakClientBumble

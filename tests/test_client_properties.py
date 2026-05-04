@@ -1,7 +1,6 @@
 """Modified version of a test in `bleak.tests.integration`"""
 
 import asyncio
-from typing import TYPE_CHECKING
 
 import pytest
 from bleak import BleakClient

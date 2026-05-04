@@ -14,10 +14,7 @@ from bumble.device import Device
 from bumble.hci import HCI_LE_Extended_Advertising_Report_Event
 
 from bleak_bumble.scanner import BleakScannerBumble
-from tests.conftest import (
-    configure_and_power_on_bumble_peripheral,
-    find_ble_device,
-)
+from tests.conftest import configure_and_power_on_bumble_peripheral
 
 DEFAULT_TIMEOUT = 5.0
 

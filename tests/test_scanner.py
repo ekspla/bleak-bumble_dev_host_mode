@@ -12,7 +12,7 @@ import pytest
 from bleak import BleakScanner
 from bleak.backends.scanner import AdvertisementData, BLEDevice
 from bumble import data_types
-from bumble.device import AdvertisingData, AdvertisingType
+from bumble.device import AdvertisingData
 
 from bleak_bumble.scanner import BleakScannerBumble
 from tests.test_utils import get_device, test_transport
