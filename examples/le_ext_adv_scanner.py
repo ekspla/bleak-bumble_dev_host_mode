@@ -32,7 +32,7 @@ async def main():
         ),
         data_types.CompleteLocalName(bumble_peripheral.name),
         # An appropriate/long test data.
-        data_types.ManufacturerSpecificData(128, bytes(
+        data_types.ManufacturerSpecificData(65535, bytes(
             "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG.0123456789"
             "the quick brown fox jumps over the lazy dog.0123456789",
             "utf8"
