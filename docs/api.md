@@ -201,6 +201,8 @@ DEVICE_DEFAULT_CONNECT_TIMEOUT                = None  # No timeout
 ``` Python
         timeout (float): Timeout for required ``discover`` call. Defaults to 10.0.
 ```
+At the moment (Bumble==0.0.228) the timeout for discover is *not implemented in 
+Bumble's API*, see `connect_le()` in `bumble.device.Device`.
 
    - Connection Supervision Timeout  
 `bumble.device`
