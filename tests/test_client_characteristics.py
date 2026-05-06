@@ -166,3 +166,89 @@ async def test_notify_gatt_char(bumble_peripheral: Device):
         # Verify no notification was received
         with pytest.raises(asyncio.TimeoutError):
             await asyncio.wait_for(notified_data.get(), timeout=1)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("force_indicate", [False, True])
+async def test_indicate_gatt_char(bumble_peripheral: Device, force_indicate: bool):
+    """Ensure indications are delivered and received by the client."""
+    CHAR_TEST_SERVICE_UUID = "2908f536-3fab-43c9-a7b2-80b6fdaae99b"
+    INDICATE_CHAR_UUID = "b1f7c8d4-9e2a-4f6b-8d3a-1234567890ab"
+    CCCD_UUID = "00002902-0000-1000-8000-00805f9b34fb"
+    if force_indicate:  # Notify and indicate can be enabled.
+        indicate_characteristic = Characteristic[bytes](
+            INDICATE_CHAR_UUID,
+            Characteristic.Properties.READ
+            | Characteristic.Properties.INDICATE
+            | Characteristic.Properties.NOTIFY,
+            Characteristic.Permissions.READABLE,
+            b"----",
+        )
+    else:  # Indicate only.
+        indicate_characteristic = Characteristic[bytes](
+            INDICATE_CHAR_UUID,
+            Characteristic.Properties.READ | Characteristic.Properties.INDICATE,
+            Characteristic.Permissions.READABLE,
+            b"----",
+        )
+    await configure_and_power_on_bumble_peripheral(
+        bumble_peripheral,
+        services=[Service(CHAR_TEST_SERVICE_UUID, [indicate_characteristic])],
+    )
+
+    device = await find_ble_device(bumble_peripheral)
+
+    indicated_data: asyncio.Queue[bytes] = asyncio.Queue()
+
+    def indicate_callback(characteristic: BleakGATTCharacteristic, data: bytearray):
+        assert characteristic.uuid.lower() == INDICATE_CHAR_UUID
+        indicated_data.put_nowait(bytes(data))
+
+    async with BleakClient(
+        device, services=[CHAR_TEST_SERVICE_UUID], backend=BleakClientBumble
+    ) as client:
+        virtual_connection = list(bumble_peripheral.connections.values())[0]
+        char = client.services.get_characteristic(INDICATE_CHAR_UUID)
+        cccd = char.get_descriptor(CCCD_UUID)
+
+        if force_indicate:
+            # with `force_indicate=True` kwarg
+            await client.start_notify(char, indicate_callback, force_indicate=True)
+        else:
+            # without `force_indicate` kwarg
+            await client.start_notify(char, indicate_callback)
+        cccd_val = await client.read_gatt_descriptor(cccd)
+        assert cccd_val == b"\x02\x00"  # check indicate is enabled
+        assert indicated_data.empty()
+
+        await bumble_peripheral.indicate_subscriber(  # type: ignore  # (missing type hints in bumble)
+            virtual_connection,
+            indicate_characteristic,
+            b"ind1",
+        )
+
+        # dont wait since 'indicate_subscriber' waits for ack from client
+        data = indicated_data.get_nowait()
+        assert data == b"ind1"
+
+        await bumble_peripheral.indicate_subscriber(  # type: ignore  # (missing type hints in bumble)
+            virtual_connection,
+            indicate_characteristic,
+            b"ind2",
+        )
+
+        # dont wait since 'indicate_subscriber' waits for ack from client
+        data = indicated_data.get_nowait()
+        assert data == b"ind2"
+
+        await client.stop_notify(INDICATE_CHAR_UUID)
+
+        await bumble_peripheral.indicate_subscriber(  # type: ignore  # (missing type hints in bumble)
+            virtual_connection,
+            indicate_characteristic,
+            b"ind2",
+        )
+
+        # Verify no indication was received after stop
+        with pytest.raises(asyncio.TimeoutError):
+            await asyncio.wait_for(indicated_data.get(), timeout=1)
