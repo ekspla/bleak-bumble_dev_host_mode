@@ -227,8 +227,7 @@ async def test_indicate_gatt_char(bumble_peripheral: Device, force_indicate: boo
             b"ind1",
         )
 
-        # dont wait since 'indicate_subscriber' waits for ack from client
-        data = indicated_data.get_nowait()
+        data = await asyncio.wait_for(indicated_data.get(), timeout=1)
         assert data == b"ind1"
 
         await bumble_peripheral.indicate_subscriber(  # type: ignore  # (missing type hints in bumble)
@@ -237,8 +236,7 @@ async def test_indicate_gatt_char(bumble_peripheral: Device, force_indicate: boo
             b"ind2",
         )
 
-        # dont wait since 'indicate_subscriber' waits for ack from client
-        data = indicated_data.get_nowait()
+        data = await asyncio.wait_for(indicated_data.get(), timeout=1)
         assert data == b"ind2"
 
         await client.stop_notify(INDICATE_CHAR_UUID)
@@ -252,3 +250,43 @@ async def test_indicate_gatt_char(bumble_peripheral: Device, force_indicate: boo
         # Verify no indication was received after stop
         with pytest.raises(asyncio.TimeoutError):
             await asyncio.wait_for(indicated_data.get(), timeout=1)
+
+
+@pytest.mark.asyncio
+async def test_notify_gatt_char_empty(bumble_peripheral: Device):
+    """Ensure empty notifications are delivered and received by the client."""
+    NOTIFY_SERVICE_UUID = "e405a09d-7c8e-4ac5-adcf-ba808e7f2d18"
+    NOTIFY_CHARACTERISITC_UUID = "d4c6dad3-76f1-4034-8871-0a6345be6cfc"
+    virtual_characteristic = Characteristic(
+        NOTIFY_CHARACTERISITC_UUID,
+        Characteristic.Properties.READ | Characteristic.Properties.NOTIFY,
+        Characteristic.Permissions.READABLE,
+        b"----",
+    )
+    await configure_and_power_on_bumble_peripheral(
+        bumble_peripheral,
+        services=[Service(NOTIFY_SERVICE_UUID, [virtual_characteristic])],
+    )
+
+    device = await find_ble_device(bumble_peripheral)
+
+    notified_data: asyncio.Queue[bytes] = asyncio.Queue()
+
+    def notify_callback(characteristic: BleakGATTCharacteristic, data: bytearray):
+        assert characteristic.uuid.lower() == NOTIFY_CHARACTERISITC_UUID
+        notified_data.put_nowait(bytes(data))
+
+    async with BleakClient(
+        device, services=[NOTIFY_SERVICE_UUID], backend=BleakClientBumble
+    ) as client:
+        await client.start_notify(NOTIFY_CHARACTERISITC_UUID, notify_callback)
+
+        await bumble_peripheral.notify_subscribers(  # type: ignore  # (missing type hints in bumble)
+            virtual_characteristic,
+            b"",
+        )
+
+        data = await asyncio.wait_for(notified_data.get(), timeout=1)
+        assert data == b""
+
+        await client.stop_notify(NOTIFY_CHARACTERISITC_UUID)

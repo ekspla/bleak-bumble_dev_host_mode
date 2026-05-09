@@ -42,6 +42,23 @@ async def test_connect_multiple_times(bumble_peripheral: Device):
 
 
 @pytest.mark.asyncio
+@pytest.mark.skipif(
+    True, reason="Timeout for discover is not implemented in Bumble yet."
+)
+async def test_connect_timeout(bumble_peripheral: Device):
+    """Connecting to a removed BLE device times out."""
+    await configure_and_power_on_bumble_peripheral(bumble_peripheral)
+
+    device = await find_ble_device(bumble_peripheral)
+
+    await bumble_peripheral.stop_advertising()
+
+    with pytest.raises(asyncio.TimeoutError):
+        async with BleakClient(device, backend=BleakClientBumble, timeout=1.0):
+            pass
+
+
+@pytest.mark.asyncio
 async def test_is_connected(bumble_peripheral: Device):
     """Check if a connection is connected is working."""
     await configure_and_power_on_bumble_peripheral(bumble_peripheral)
