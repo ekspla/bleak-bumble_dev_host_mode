@@ -9,6 +9,8 @@ import asyncio
 import pytest
 from bleak import BleakClient, BleakScanner
 from bumble.controller import Controller
+from bumble.device import DeviceConfiguration
+from bumble.hci import Address
 from bumble.transport.common import Transport
 
 from bleak_bumble import get_link, transports
@@ -20,7 +22,8 @@ CONN_ADDR = "12:34:56:78:AB:CD"
 
 
 @pytest.mark.asyncio
-async def test_connect_host_mode():
+@pytest.mark.parametrize("use_dev_config", [False, True])
+async def test_connect_host_mode(use_dev_config: bool):
     async def add_pytest_host_transport():
         """Connect the host to a virtual controller with LocalLink()."""
         if "pytest" in transports.keys():
@@ -38,12 +41,18 @@ async def test_connect_host_mode():
 
     _ = await add_pytest_host_transport()
 
+    kwargs = {"cfg": "pytest", "host_mode": True}
+    if use_dev_config:
+        kwargs["dev_cfg"] = DeviceConfiguration(
+            name="pytest", address=Address("F0:F1:F2:F3:F4:F5")
+        )
+
     device = await BleakScanner.find_device_by_name(
         conn_dev.name,
         backend=BleakScannerBumble,
-        cfg="pytest",
-        host_mode=True,
+        **kwargs,
     )
+
     assert device is not None
     assert (transports.pop("pytest", None)) is None
 
@@ -52,8 +61,7 @@ async def test_connect_host_mode():
     client = BleakClient(
         device,
         backend=BleakClientBumble,
-        cfg="pytest",
-        host_mode=True,
+        **kwargs,
     )
 
     await client.connect()
