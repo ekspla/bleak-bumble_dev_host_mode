@@ -64,6 +64,7 @@ BleakScanner(
     backend=BleakScannerBumble,
     cfg: Optional[BumbleTransportCfg] = None,
     host_mode: bool = False,
+    dev_cfg: Optional[DeviceConfiguration] = None,
     **kwargs
 )
 ```
@@ -73,6 +74,7 @@ BleakScanner(
 - `service_uuids` - List of service UUIDs to filter for
 - `cfg` - Transport configuration (uses default if None)
 - `host_mode` - Enable HCI host mode
+- `dev_cfg` - Parameters for bluetooth device (uses default if None)
 - `**kwargs` - Additional arguments passed to parent class
 
 **Methods:**
@@ -104,6 +106,7 @@ BleakClient(
     cfg: Optional[BumbleTransportCfg] = None,
     host_mode: bool = False,
     phys: Optional[str] = None,
+    dev_cfg: Optional[DeviceConfiguration] = None,
     **kwargs
 )
 ```
@@ -116,6 +119,7 @@ BleakClient(
 Preferences for the 1M PHY are always set. See 
 [`examples/client_change_connection_phy.py`](https://github.com/ekspla/bleak-bumble_dev_host_mode/blob/main/examples/client_change_connection_phy.py) 
 how to use. 
+- `dev_cfg` - Parameters for bluetooth device (uses default if None)
 - `**kwargs` - Additional arguments passed to parent class
 
 **Methods:**
@@ -125,6 +129,11 @@ Connect to the device.
 
 #### `disconnect() -> None`
 Disconnect from the device.
+
+#### `pair() -> None`
+Pair to the peer device using *Just Work* (level 1) as default protocol.  
+Use `PairingDelegate` (e.g. `bumble/apps/pair.py`, `bumble/examples/run_gatt_server_with_pairing_delegate.py`) 
+for level 2. An example is shown in `examples/example_pairing.py`.
 
 #### `get_services(**kwargs) -> BleakGATTServiceCollection`
 Get GATT services from the device.
