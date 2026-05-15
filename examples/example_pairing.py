@@ -1,5 +1,5 @@
 """This example demonstrates how to pair with a peripheral with various IOs:
-keyboard', 'display', 'display+keyboard', 'display+yes/no' and 'none'.
+'keyboard', 'display', 'display+keyboard', 'display+yes/no' and 'none'.
 
 `Delegate` in `bumble/apps/pair.py` is used for ease of demonstration. 
 
@@ -59,8 +59,8 @@ async def main(io, hci_transport):
     ) as client:
 
         print('Connected.')
-
         await asyncio.sleep(1)
+
         # This should fail.
         try:
             hrm_char = client.services.get_characteristic(HEART_RATE_MEASUREMENT)
@@ -77,9 +77,9 @@ async def main(io, hci_transport):
     ) as client:
 
         print('Connected.')
-
         await asyncio.sleep(1)
 
+        # Use Delegate in bumble/apps/pair.py
         backend = client._backend
         backend._dev.pairing_config_factory = lambda connection: PairingConfig(
             sc=SC,
