@@ -13,7 +13,7 @@ from bleak.backends.scanner import (
 )
 from bumble.controller import Controller
 from bumble.core import UUID, AdvertisingData
-from bumble.device import Advertisement, Device
+from bumble.device import Advertisement, Device, DeviceConfiguration
 from bumble.hci import Address
 from bumble.host import Host
 
@@ -140,6 +140,8 @@ class BleakScannerBumble(BaseBleakScanner):
             Set to ``True`` to set bumble as an HCI Host. Useful
             for connecting an external HCI controller
             If ``False`` it will be set as a controller.
+        dev_cfg:
+            Optional DeviceConfiguration
     """
 
     def __init__(
@@ -159,6 +161,9 @@ class BleakScannerBumble(BaseBleakScanner):
         self._host_mode: Final[bool] = kwargs.get(
             "host_mode", is_host_mode_enabled_from_env()
         )
+
+        # Device configuration
+        self._dev_cfg: Final[DeviceConfiguration | None] = kwargs.get("dev_cfg", None)
 
     def on_advertisement(self, advertisement: Advertisement):
         local_name = get_local_name(advertisement)
@@ -193,6 +198,10 @@ class BleakScannerBumble(BaseBleakScanner):
             self._dev = Device("scanner", address=Address(SCANNER_BD_ADDR))
             self._dev.host = Host()
             self._dev.host.controller = Controller("scanner", link=get_link())
+        elif self._dev_cfg is not None:
+            self._dev = Device.from_config_with_hci(
+                self._dev_cfg, transport.source, transport.sink
+            )
         else:
             self._dev = Device.with_hci(
                 "scanner", Address(SCANNER_BD_ADDR), transport.source, transport.sink

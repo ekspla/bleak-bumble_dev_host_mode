@@ -20,7 +20,13 @@ from bleak.backends.service import BleakGATTService, BleakGATTServiceCollection
 from bleak.exc import BleakDeviceNotFoundError, BleakError
 from bumble.controller import Controller
 from bumble.core import UUID, TimeoutError
-from bumble.device import Connection, ConnectionParametersPreferences, Device, Peer
+from bumble.device import (
+    Connection,
+    ConnectionParametersPreferences,
+    Device,
+    DeviceConfiguration,
+    Peer,
+)
 from bumble.hci import HCI_LE_1M_PHY, HCI_LE_2M_PHY, HCI_LE_CODED_PHY, Address, Phy
 from bumble.host import Host
 
@@ -63,6 +69,8 @@ class BleakClientBumble(BaseBleakClient):
         phys:
             Set a comma separated string consisting of '1m', '2m' and 'coded'.
             Preferences for the default 1M PHY are always set by the backend.
+        dev_cfg:
+            Optional DeviceConfiguration
 
     """
 
@@ -98,6 +106,9 @@ class BleakClientBumble(BaseBleakClient):
             Dict[Phy, ConnectionParametersPreferences] | None
         ) = None
 
+        # Device configuration
+        self._dev_cfg: Final[DeviceConfiguration | None] = kwargs.get("dev_cfg", None)
+
         # Use stored peer name in BLEDevice if exists
         self._name: str = ""
         if isinstance(address_or_ble_device, BLEDevice) and address_or_ble_device.name:
@@ -125,9 +136,13 @@ class BleakClientBumble(BaseBleakClient):
         timeout = self._timeout
         transport = await start_transport(self._cfg, self._host_mode)
         if not self._host_mode:
-            self._dev = Device("client")
+            self._dev = Device("client", config=self._dev_cfg)
             self._dev.host = Host()
             self._dev.host.controller = Controller("Client", link=get_link())
+        elif self._dev_cfg is not None:
+            self._dev = Device.from_config_with_hci(
+                self._dev_cfg, transport.source, transport.sink
+            )
         else:
             self._dev = Device.with_hci(
                 "client", Address(CLIENT_BD_ADDR), transport.source, transport.sink
