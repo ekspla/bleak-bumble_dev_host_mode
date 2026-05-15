@@ -8,15 +8,12 @@ by changing combinations of initiator's and responder's IOs.
 """
 
 import asyncio
-
-import os
-os.environ["BLEAK_BUMBLE"] = "serial:/dev/tnt2,1000000,rtscts"
-os.environ["BLEAK_BUMBLE_HOST"] = "1"
-os.environ["BUMBLE_LOGLEVEL"] = "DEBUG"
+import click
+from functools import wraps
 
 from bumble.apps.pair import Delegate  # Use Delegate in apps for ease of demonstrations. 
 from bumble.hci import Address
-from bumble.pairing import PairingConfig, PairingDelegate
+from bumble.pairing import PairingConfig
 
 from bleak import BleakClient, BleakScanner
 from bleak_bumble.client import BleakClientBumble
@@ -26,22 +23,39 @@ from bleak_bumble.scanner import BleakScannerBumble
 # Reading this characteristics requires pairing.
 HEART_RATE_MEASUREMENT = "00002a37-0000-1000-8000-00805f9b34fb"
 
-SC = True  # True: secure connection / False: legacy
-MITM = True
-BONDING = True
+SC = True  # True: Secure Connections protocol / False: Legacy protocol
+MITM = True  # Request MITM protection
+BONDING = True  # Enable bonding
 MODE = "le"
-# Chose IO from: 'keyboard', 'display', 'display+keyboard', 'display+yes/no' and 'none'
-IO = 'none'  # 'none' for Just Works pairing
-PROMPT = False
+PROMPT = False  # Prompt to accept/reject pairing request
 
-async def main():
+
+def async_cmd(func):
+  @wraps(func)
+  def wrapper(*args, **kwargs):
+    return asyncio.run(func(*args, **kwargs))
+  return wrapper
+
+
+@click.command()
+@click.option(
+    '--io',
+    type=click.Choice(
+        ['keyboard', 'display', 'display+keyboard', 'display+yes/no', 'none']
+    ),
+    default='none',  # 'none' for Just Works pairing
+    show_default=True,
+)
+@click.argument('hci_transport')
+@async_cmd
+async def main(io, hci_transport):
     target_device = await BleakScanner.find_device_by_name(
-        "Bumble", backend=BleakScannerBumble
+        "Bumble", backend=BleakScannerBumble, cfg=hci_transport, host_mode=True
     )
 
     print("Connecting...")
     async with BleakClient(
-        target_device, backend=BleakClientBumble
+        target_device, backend=BleakClientBumble, cfg=hci_transport, host_mode=True
     ) as client:
 
         print('Connected.')
@@ -59,7 +73,7 @@ async def main():
     await asyncio.sleep(2)
 
     async with BleakClient(
-        target_device, backend=BleakClientBumble
+        target_device, backend=BleakClientBumble, cfg=hci_transport, host_mode=True
     ) as client:
 
         print('Connected.')
@@ -73,7 +87,7 @@ async def main():
             bonding=BONDING,
             #oob=oob_contexts,
             #identity_address_type=identity_address_type,
-            delegate=Delegate(MODE, connection, IO, PROMPT),
+            delegate=Delegate(MODE, connection, io, PROMPT),
         )
 
         print("Pairing...")
@@ -91,7 +105,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    finally:
-        asyncio.new_event_loop() # Clear retained state.
+    main()
