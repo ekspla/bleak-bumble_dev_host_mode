@@ -1,4 +1,4 @@
-"""Tests for `bleak.backends.bumble` package, specifically `Just Works` pairing."""
+"""Tests for `bleak.backends.bumble` package, specifically `Just Work` pairing."""
 
 import pytest
 from bleak import BleakClient
@@ -15,7 +15,7 @@ HEART_RATE_MEASUREMENT = "00002a37-0000-1000-8000-00805f9b34fb"
 # Suppress warning from Session.start_encryption() in `bumble/smp.py`
 @pytest.mark.filterwarnings("ignore::DeprecationWarning:bumble.*")
 @pytest.mark.asyncio
-async def test_just_works_pairing():
+async def test_just_work_pairing():
     conn_dev = get_device(CONN_ADDR)
     svc = Service(
         HEART_RATE_SERVICE,
