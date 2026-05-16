@@ -1,10 +1,10 @@
-"""This example demonstrates how to pair with a peripheral with various IOs:
+"""An example of how to pair with a peripheral using various I/O capabilties:
 'keyboard', 'display', 'display+keyboard', 'display+yes/no' and 'none'.
 
 `Delegate` in `bumble/apps/pair.py` is used for ease of demonstration. 
 
 It was tested against `bumble/apps/pair.py` peripheral on Linux
-by changing combinations of initiator's and responder's IOs.
+by changing combinations of initiator's and responder's I/Os.
 """
 
 import asyncio
