@@ -131,9 +131,9 @@ Connect to the device.
 Disconnect from the device.
 
 #### `pair() -> None`
-Pair to the peer device using *Just Work* (level 1) as default protocol.  
+Pair to the peer device using *Just Works* as a default protocol.  
 Use `PairingDelegate` (e.g. `bumble/apps/pair.py`, `bumble/examples/run_gatt_server_with_pairing_delegate.py`) 
-for level 2. An example is shown in `examples/example_pairing.py`.
+for higher security levels. An example is shown in `examples/example_pairing.py`.
 
 #### `get_services(**kwargs) -> BleakGATTServiceCollection`
 Get GATT services from the device.
