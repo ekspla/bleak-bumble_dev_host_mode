@@ -31,10 +31,10 @@ PROMPT = False  # Prompt to accept/reject pairing request
 
 
 def async_cmd(func):
-  @wraps(func)
-  def wrapper(*args, **kwargs):
-    return asyncio.run(func(*args, **kwargs))
-  return wrapper
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        return asyncio.run(func(*args, **kwargs))
+    return wrapper
 
 
 @click.command()
