@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """This example demonstrates receiving LE extended advertisements with scanner.
 
 It was tested with a pair of RTL8761B usb dongles on Linux, 

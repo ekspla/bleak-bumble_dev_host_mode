@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """An example of how to pair with a peripheral using various I/O capabilties:
 'keyboard', 'display', 'display+keyboard', 'display+yes/no' and 'none'.
 

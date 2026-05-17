@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """This example demonstrates how to get/set connection PHYs.
 
 It was tested with a pair of RTL8761B usb dongles on Linux, 
@@ -11,8 +12,7 @@ from bumble.core import AdvertisingData
 from bumble.device import Device, AdvertisingParameters
 from bumble.hci import Address, HCI_LE_1M_PHY, HCI_LE_2M_PHY, HCI_LE_CODED_PHY
 
-from bleak import BleakClient
-from bleak import BleakScanner
+from bleak import BleakClient, BleakScanner
 from bleak_bumble import start_transport
 from bleak_bumble.client import BleakClientBumble
 from bleak_bumble.scanner import BleakScannerBumble
