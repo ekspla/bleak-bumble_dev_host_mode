@@ -14,7 +14,6 @@ from bleak.backends.scanner import (
 from bumble.controller import Controller
 from bumble.core import UUID, AdvertisingData
 from bumble.device import Advertisement, Device, DeviceConfiguration
-from bumble.hci import Address
 from bumble.host import Host
 
 from bleak_bumble import (
@@ -163,7 +162,12 @@ class BleakScannerBumble(BaseBleakScanner):
         )
 
         # Device configuration
-        self._dev_cfg: Final[DeviceConfiguration | None] = kwargs.get("dev_cfg", None)
+        self._dev_cfg: DeviceConfiguration = kwargs.get(
+            "dev_cfg",
+            DeviceConfiguration.from_dict(
+                {"name": "scanner", "address": SCANNER_BD_ADDR}
+            ),
+        )
 
     def on_advertisement(self, advertisement: Advertisement):
         local_name = get_local_name(advertisement)
@@ -195,16 +199,12 @@ class BleakScannerBumble(BaseBleakScanner):
     async def start(self) -> None:
         transport = await start_transport(self._cfg, self._host_mode)
         if not self._host_mode:
-            self._dev = Device("scanner", address=Address(SCANNER_BD_ADDR))
+            self._dev = Device(config=self._dev_cfg)
             self._dev.host = Host()
             self._dev.host.controller = Controller("scanner", link=get_link())
-        elif self._dev_cfg is not None:
+        else:
             self._dev = Device.from_config_with_hci(
                 self._dev_cfg, transport.source, transport.sink
-            )
-        else:
-            self._dev = Device.with_hci(
-                "scanner", Address(SCANNER_BD_ADDR), transport.source, transport.sink
             )
         self._dev.on("advertisement", self.on_advertisement)
         await self._dev.power_on()

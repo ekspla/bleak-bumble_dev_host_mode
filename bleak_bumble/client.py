@@ -27,7 +27,7 @@ from bumble.device import (
     DeviceConfiguration,
     Peer,
 )
-from bumble.hci import HCI_LE_1M_PHY, HCI_LE_2M_PHY, HCI_LE_CODED_PHY, Address, Phy
+from bumble.hci import HCI_LE_1M_PHY, HCI_LE_2M_PHY, HCI_LE_CODED_PHY, Phy
 from bumble.host import Host
 
 from bleak_bumble import (
@@ -107,7 +107,12 @@ class BleakClientBumble(BaseBleakClient):
         ) = None
 
         # Device configuration
-        self._dev_cfg: Final[DeviceConfiguration | None] = kwargs.get("dev_cfg", None)
+        self._dev_cfg: DeviceConfiguration = kwargs.get(
+            "dev_cfg",
+            DeviceConfiguration.from_dict(
+                {"name": "client", "address": CLIENT_BD_ADDR}
+            ),
+        )
 
         # Use stored peer name in BLEDevice if exists
         self._name: str = ""
@@ -136,16 +141,12 @@ class BleakClientBumble(BaseBleakClient):
         timeout = self._timeout
         transport = await start_transport(self._cfg, self._host_mode)
         if not self._host_mode:
-            self._dev = Device("client", config=self._dev_cfg)
+            self._dev = Device(config=self._dev_cfg)
             self._dev.host = Host()
             self._dev.host.controller = Controller("Client", link=get_link())
-        elif self._dev_cfg is not None:
+        else:
             self._dev = Device.from_config_with_hci(
                 self._dev_cfg, transport.source, transport.sink
-            )
-        else:
-            self._dev = Device.with_hci(
-                "client", Address(CLIENT_BD_ADDR), transport.source, transport.sink
             )
         self._dev.on("connection", self.on_connection)
         logger.debug("Connecting to device @ %s", self.address)
