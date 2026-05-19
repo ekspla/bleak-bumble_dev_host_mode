@@ -29,6 +29,7 @@ from bumble.device import (
 )
 from bumble.hci import HCI_LE_1M_PHY, HCI_LE_2M_PHY, HCI_LE_CODED_PHY, Phy
 from bumble.host import Host
+from bumble.keys import KeyStore
 
 from bleak_bumble import (
     BumbleTransportCfg,
@@ -220,9 +221,11 @@ class BleakClientBumble(BaseBleakClient):
     @override
     async def unpair(self) -> None:
         """Unpair with the peripheral."""
-        warnings.warn(
-            "Unpairing is seemingly unavailable in the Bumble API at the moment."
-        )
+        if hasattr(self._dev, "keystore"):
+            try:
+                await self._dev.keystore.delete(str(self._connection.peer_address))  # type: ignore  # (missing type hints in bumble)
+            except:
+                logger.debug("Device not found or already unpaired.")
         return None
 
     @property
