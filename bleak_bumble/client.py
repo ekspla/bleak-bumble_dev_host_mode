@@ -29,7 +29,6 @@ from bumble.device import (
 )
 from bumble.hci import HCI_LE_1M_PHY, HCI_LE_2M_PHY, HCI_LE_CODED_PHY, Phy
 from bumble.host import Host
-from bumble.keys import KeyStore
 
 from bleak_bumble import (
     BumbleTransportCfg,
@@ -137,7 +136,9 @@ class BleakClientBumble(BaseBleakClient):
 
         """
         if pair:
-            logger.debug("Explicit pairing is not implemented in Bumble backend.")
+            logger.debug(
+                "Pair with the peripheral before connecting is not implemented."
+            )
 
         timeout = self._timeout
         transport = await start_transport(self._cfg, self._host_mode)
@@ -213,9 +214,8 @@ class BleakClientBumble(BaseBleakClient):
     @override
     async def pair(self, *args, **kwargs) -> None:
         """Pair with the peripheral."""
-        if not self._peer:
-            return None
-        await self._peer.connection.pair()
+        if self._peer:
+            await self._peer.connection.pair()
         return None
 
     @override
