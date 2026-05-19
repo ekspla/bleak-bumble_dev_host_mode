@@ -20,7 +20,7 @@ lib/python3.12/site-packages/bumble/examples/device3.json \
 serial:/dev/tnt0,1000000,rtscts
 ```
 
-- On the third console, run this **central** example stored in `bleak_bumble/examples`.  
+- On the third console, run [this **central** example](./example_pairing.py) stored in `bleak_bumble/examples`.  
 The I/O ['keyboard', 'display', 'display+keyboard', 'display+yes/no', 'none'] defaults to 'none'.
 ```
 python example_pairing.py \
