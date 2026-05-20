@@ -2,7 +2,7 @@ name: Tests-workflow
 
 on:
   workflow_dispatch:
-    branches: [ dev ]
+    branches: [ test-workflow, dev ]
 
 jobs:
   test:
