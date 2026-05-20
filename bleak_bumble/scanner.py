@@ -213,7 +213,8 @@ class BleakScannerBumble(BaseBleakScanner):
     @override
     async def stop(self) -> None:
         if self._dev is None:
-            raise RuntimeError("Scanner not started")
+            logger.debug("Scanner not started.")
+            return
         await self._dev.stop_scanning()
         # The transport must be closed in host_mode.
         if self._host_mode:

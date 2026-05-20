@@ -67,4 +67,5 @@ async def test_adv_data(is_complete_local_name: bool):
         pytest.fail("Test timed out waiting for advertisement data")
     finally:
         await scanner.stop()
+        await scanner.stop()
         await scan_dev.stop_advertising()
