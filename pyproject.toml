@@ -24,7 +24,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.10"
-bleak = "3.0.1"
+bleak = "3.0.2"
 bumble = "0.0.228"
 
 [tool.poetry.group.dev.dependencies]
