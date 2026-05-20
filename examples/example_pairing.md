@@ -5,7 +5,7 @@ Can be also run on two real/physical controllers, of course.
 
 - On the first console, run **virtual controllers**  
 `tnt0`--`tnt1` and `tnt2`--`tnt3`, in this case, were paired virtual null modem cables using [tty0tty](https://github.com/freemed/tty0tty). 
-On Windows, use [com0com](https://com0com.sourceforge.net/). 
+On Windows, use [com0com](https://com0com.sourceforge.net/). Instead of serial, the other transport such as `PTY` may also be used. 
 ```
 python lib/python3.12/site-packages/bumble/apps/controllers.py \
 serial:/dev/tnt1,1000000,rtscts \
