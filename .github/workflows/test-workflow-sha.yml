@@ -47,7 +47,7 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         status: pending
-        sha: ${{ github.sha }}
+        sha: ${{ github.event.inputs.ref }}
         context: Check by workflow-dispatch
     
     - name: Run linters
@@ -65,5 +65,5 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         status: ${{ job.status }}
-        sha: ${{ github.sha }}
+        sha: ${{ github.event.inputs.ref }}
         context: Check by workflow-dispatch
