@@ -8,12 +8,11 @@ on:
         required: true
         default: ""
     
-  permissions:
-    actions: write
-    statuses: write
-    
 jobs:
   test:
+    permissions:
+      actions: write
+      statuses: write
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
