@@ -8,6 +8,10 @@ on:
         required: true
         default: ""
     
+  permissions:
+    actions: write
+    statuses: write
+    
 jobs:
   test:
     runs-on: ${{ matrix.os }}
