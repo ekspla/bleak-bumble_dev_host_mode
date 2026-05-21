@@ -8,11 +8,11 @@ on:
         required: true
         default: ""
     
+permissions:
+  statuses: write
+    
 jobs:
   test:
-    permissions:
-      actions: write
-      statuses: write
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -26,6 +26,14 @@ jobs:
             python-version: '3.10'
     
     steps:
+    - name: Set commit statut as pending
+      uses: myrotvorets/set-commit-status-action@master
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        status: pending
+        sha: ${{ ref }}
+        context: Check by workflow-dispatch
+    
     - uses: actions/checkout@v6
       with:
         fetch-depth: 0
@@ -50,3 +58,12 @@ jobs:
     - name: Run tests
       run: |
         poetry run pytest tests/ -v
+    
+    - name: Set final commit status
+      uses: myrotvorets/set-commit-status-action@master
+      if: always()
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        status: ${{ job.status }}
+        sha: ${{ ref }}
+        context: Check by workflow-dispatch
