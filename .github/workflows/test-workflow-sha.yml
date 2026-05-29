@@ -57,6 +57,7 @@ jobs:
     
     - name: Run tests
       run: |
+        export PYTHONDONTWRITEBYTECODE=1
         poetry run pytest tests/ -v
     
     - name: Set final commit status
