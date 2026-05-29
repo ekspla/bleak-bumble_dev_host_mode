@@ -57,7 +57,7 @@ jobs:
     
     - name: Run tests
       run: |
-        poetry run PYTHONDONTWRITEBYTECODE=1 pytest tests/ -v
+        poetry run pytest tests/ -v
     
     - name: Set final commit status
       uses: myrotvorets/set-commit-status-action@master
