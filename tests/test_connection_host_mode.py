@@ -65,7 +65,6 @@ async def test_connect_host_mode(use_dev_config: bool):
     )
 
     await client.connect()
-    await asyncio.sleep(1)
     assert client.is_connected
 
     await client.disconnect()

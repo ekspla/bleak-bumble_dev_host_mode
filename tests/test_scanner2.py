@@ -16,7 +16,7 @@ from bumble.hci import HCI_LE_Extended_Advertising_Report_Event
 from bleak_bumble.scanner import BleakScannerBumble
 from tests.conftest import configure_and_power_on_bumble_peripheral
 
-DEFAULT_TIMEOUT = 5.0
+DEFAULT_TIMEOUT = 2.0
 
 
 @pytest.mark.asyncio
@@ -24,7 +24,9 @@ async def test_discover(bumble_peripheral: Device):
     """Scanner discovery is finding the device."""
     await configure_and_power_on_bumble_peripheral(bumble_peripheral)
 
-    devices = await BleakScanner.discover(return_adv=True, backend=BleakScannerBumble)
+    devices = await BleakScanner.discover(
+        timeout=DEFAULT_TIMEOUT, return_adv=True, backend=BleakScannerBumble
+    )
     filtered_devices = list(
         filter(
             lambda device: device[1].local_name == bumble_peripheral.name,
