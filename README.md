@@ -11,7 +11,8 @@ This is a fork/modified version of [vChavezB/bleak-bumble](https://github.com/vC
 [`connection interval`, `att mtu`](https://github.com/ekspla/micropython_aioble_examples/tree/main/nus_modem_full_ver#linux-and-also-windows-with-bumble-backend), 
 `data length`, [`connection PHYs`](examples/client_change_connection_phy.py), etc.\) 
 and [pairing/bonding with delegate](examples/example_pairing.md) using Bumble's API
-- **Virtual Bluetooth testing**: Perform Bluetooth functional tests without physical hardware using virtual Bluetooth stacks like Android Emulator, Zephyr RTOS and 
+- **Virtual Bluetooth testing**: Perform Bluetooth functional tests without physical hardware using virtual Bluetooth stacks like 
+[Android Emulator](https://google.github.io/bumble/transports/android_emulator.html), [Zephyr RTOS](https://github.com/google/bumble/issues/215) and 
 [MicroPython](https://github.com/ekspla/micropython_aioble_examples/tree/main/nus_modem_full_ver#virtual-server-and-client-on-bumbles-locallink) 
 - **Cross-network connections**: Connect HCI Controllers that are not in the same radio network (virtual or physical)
 
