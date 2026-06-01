@@ -25,7 +25,7 @@ def bumble_peripheral() -> Device:
         # use random static address to avoid device caching issues, when characteristics change between test runs
         address=Address.generate_static_address(),
     )
-    device.advertising_interval_min = device.advertising_interval_max = 200
+    device.advertising_interval_min = device.advertising_interval_max = 20
     return device
 
 

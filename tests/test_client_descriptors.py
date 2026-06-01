@@ -98,5 +98,8 @@ async def test_write_gatt_descriptor(bumble_peripheral: Device):
         assert descriptor
 
         await client.write_gatt_descriptor(descriptor, b"Description")
-        await asyncio.sleep(1)
+        for _ in range(20):
+            if virtual_descriptor.value != b"-----------":
+                break
+            await asyncio.sleep(0.05)
         assert virtual_descriptor.value == b"Description"  # type: ignore  # (missing type hints in bumble)

@@ -16,5 +16,5 @@ def get_device(addr: str) -> Device:
     device = Device("", Address(addr))
     device.host = Host()
     device.host.controller = Controller("dev", link=get_link())
-    device.advertising_interval_min = device.advertising_interval_max = 200
+    device.advertising_interval_min = device.advertising_interval_max = 20
     return device

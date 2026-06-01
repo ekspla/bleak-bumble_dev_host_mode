@@ -36,7 +36,8 @@ async def test_read_gatt_char(bumble_peripheral: Device):
     async with BleakClient(
         device, services=[READ_SERVICE_UUID], backend=BleakClientBumble
     ) as client:
-        data = await client.read_gatt_char(READ_CHARACTERISITC_UUID)
+        char = client.services.get_characteristic(READ_CHARACTERISITC_UUID)
+        data = await client.read_gatt_char(char)
         assert data == b"DATA"
 
 
@@ -61,9 +62,10 @@ async def test_write_gatt_char_with_response(bumble_peripheral: Device):
     async with BleakClient(
         device, services=[WRITE_WITH_RESPONSE_SERVICE_UUID], backend=BleakClientBumble
     ) as client:
-        await client.write_gatt_char(
-            WRITE_WITH_RESPONSE_CHARACTERISITC_UUID, b"DATA", response=True
+        char = client.services.get_characteristic(
+            WRITE_WITH_RESPONSE_CHARACTERISITC_UUID
         )
+        await client.write_gatt_char(char, b"DATA", response=True)
         assert virtual_characteristic.value == b"DATA"
 
 
@@ -98,9 +100,10 @@ async def test_write_gatt_char_no_response(bumble_peripheral: Device):
         services=[WRITE_WITHOUT_RESPONSE_SERVICE_UUID],
         backend=BleakClientBumble,
     ) as client:
-        await client.write_gatt_char(
-            WRITE_WITHOUT_RESPONSE_CHARACTERISITC_UUID, b"DATA", response=False
+        char = client.services.get_characteristic(
+            WRITE_WITHOUT_RESPONSE_CHARACTERISITC_UUID
         )
+        await client.write_gatt_char(char, b"DATA", response=False)
         written_value = await asyncio.wait_for(
             peripheral_write_callback_called, timeout=1
         )
@@ -134,8 +137,9 @@ async def test_notify_gatt_char(bumble_peripheral: Device):
     async with BleakClient(
         device, services=[NOTIFY_SERVICE_UUID], backend=BleakClientBumble
     ) as client:
+        char = client.services.get_characteristic(NOTIFY_CHARACTERISITC_UUID)
         await client.start_notify(
-            NOTIFY_CHARACTERISITC_UUID,
+            char,
             notify_callback,
         )
         assert notified_data.empty()
@@ -156,7 +160,7 @@ async def test_notify_gatt_char(bumble_peripheral: Device):
         data = await asyncio.wait_for(notified_data.get(), timeout=1)
         assert data == b"2345"
 
-        await client.stop_notify(NOTIFY_CHARACTERISITC_UUID)
+        await client.stop_notify(char)
 
         await bumble_peripheral.notify_subscribers(  # type: ignore  # (missing type hints in bumble)
             virtual_characteristic,
@@ -239,7 +243,7 @@ async def test_indicate_gatt_char(bumble_peripheral: Device, force_indicate: boo
         data = await asyncio.wait_for(indicated_data.get(), timeout=1)
         assert data == b"ind2"
 
-        await client.stop_notify(INDICATE_CHAR_UUID)
+        await client.stop_notify(char)
 
         await bumble_peripheral.indicate_subscriber(  # type: ignore  # (missing type hints in bumble)
             virtual_connection,
@@ -279,7 +283,8 @@ async def test_notify_gatt_char_empty(bumble_peripheral: Device):
     async with BleakClient(
         device, services=[NOTIFY_SERVICE_UUID], backend=BleakClientBumble
     ) as client:
-        await client.start_notify(NOTIFY_CHARACTERISITC_UUID, notify_callback)
+        char = client.services.get_characteristic(NOTIFY_CHARACTERISITC_UUID)
+        await client.start_notify(char, notify_callback)
 
         await bumble_peripheral.notify_subscribers(  # type: ignore  # (missing type hints in bumble)
             virtual_characteristic,
@@ -289,4 +294,4 @@ async def test_notify_gatt_char_empty(bumble_peripheral: Device):
         data = await asyncio.wait_for(notified_data.get(), timeout=1)
         assert data == b""
 
-        await client.stop_notify(NOTIFY_CHARACTERISITC_UUID)
+        await client.stop_notify(char)
