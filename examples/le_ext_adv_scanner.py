@@ -3,6 +3,12 @@
 
 It was tested with a pair of RTL8761B usb dongles on Linux, 
 and was confirmed to work by using nRF BLE sniffer.
+
+NOTE:
+ - Even if S=8 (phy_options=2 or 0) is specified by host, my RTL8761B controller 
+   with fw version 0xddd5c761 always prefers S=2 in advertisement. This is in 
+   contrast to the explanation in Bluetooth specification as follows:
+   `If advertising on the LE Coded PHY, the S=8 coding shall be assumed.`
 """
 
 import asyncio
