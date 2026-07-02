@@ -5,14 +5,12 @@ It was tested with a pair of RTL8761B usb dongles on Linux,
 and was confirmed to work by using nRF BLE sniffer.
 
 NOTES:
- - Even if `phy_options=0` is specified by host, my RTL8761B controllers always 
-   prefer S=2 in LE CODED advertisement. This is in contrast to the explanation 
-   in Bluetooth specification as follows:
+ - My RTL8761B controllers always prefer S=2 in LE_CODED advertisement broadcast. 
+   This is in contrast to the explanation in Bluetooth specification as follows:
    `If advertising on the LE Coded PHY, the S=8 coding shall be assumed.`
 
  - Coding Scheme Selection on Advertising (CSSA), which allows to specify the 
-   value of coding parameter `S`, is introduced in Bluetooth 5.4. RTL8761C 
-   probably works.
+   coding parameter `S`, is introduced in Bluetooth 5.4. RTL8761C probably works.
 
  - `HCI_LE_Set_Extended_Advertising_Parameters_V2_Command` for CSSA is not yet 
    supoorted in Bumble==0.0.230.
@@ -66,7 +64,11 @@ async def main():
                 primary_advertising_interval_max = 200,
                 primary_advertising_phy = HCI_LE_1M_PHY,
                 secondary_advertising_phy = HCI_LE_CODED_PHY,
-                secondary_advertising_phy_options = 0,
+                # The following options are ignored unless 
+                # HCI_LE_SET_EXTENDED_ADVERTISING_PARAMETERS_V2 
+                # is supported by both the controller and the host (Bumble).
+                #primary_advertising_phy_options = 0,
+                #secondary_advertising_phy_options = 0,
             ),
             advertising_data = bytes(AdvertisingData(adv_data)),
         )
