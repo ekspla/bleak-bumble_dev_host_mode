@@ -2,25 +2,26 @@
 
 ## Using a RTL8761B as scanner and an another RTL8761B or Zephyr HCI-USB as advertiser
 
-Bleak-Bumble scanner/observer successfully worked with RTL8761B dongle (UB500, 
-TP-Link) in receiving extended advertisements (LE_1M_PHY, LE_CODED_PHY S=2/S=8) 
-sent from Bumble's advertiser/broadcaster.  
+**Bleak-Bumble scanner / observer successfully worked with RTL8761B dongle** 
+(UB500, TP-Link) **in receiving extended advertisements (LE_1M_PHY and 
+LE_CODED_PHY S=2 / S=8)** sent from Bumble advertiser / broadcaster.  
 
-Because Coding Scheme Selection on Advertising (CSSA) introduced in Bluetooth 
-5.4, which allows to specify the coding parameter `S`, is not supported in Bumble 
-host and in my bluetooth controllers yet, two different controllers have to be 
-used for S=2 and S=8 in LE_CODED_PHY; RTL8761B was used for S=2 coding while 
-Zephyr's HCI-USB (nRF52840) for S=8. In all of the cases, advertisement packets 
-were confirmed by nRF BLE sniffer (Nordic's nRF52840 dongle) with Wireshark.  
+Because Coding Scheme Selection on Advertising (CSSA) introduced in Bluetooth 5.4, 
+which allows to specify the coding parameter `S`, is not supported in Bumble host 
+and in my bluetooth controllers yet, two different controllers have to be used for 
+`S=2` and `S=8` in LE_CODED_PHY; RTL8761B was used for `S=2` coding while 
+[Zephyr's HCI-USB](https://docs.zephyrproject.org/latest/samples/bluetooth/hci_usb/README.html) 
+\(Xiao nRF52840\) for `S=8`. In all of the cases, **advertisement packets were 
+confirmed by nRF BLE sniffer** (Nordic's nRF52840 dongle) with Wireshark.  
 
 | Scanner/Observer | Advertiser/Broadcaster | PHY         | Result |
 | ---------------- | ---------------------- | ----------- | ------ |
 | RTL8761B         | RTL8761B               | 1M          | works  |
 | RTL8761B         | RTL8761B               | CODED (S=2) | works  |
 | RTL8761B         | RTL8761B               | CODED (S=8) | -      |
-| RTL8761B         | Zephyr's HCI-USB       | 1M          | works  |
-| RTL8761B         | Zephyr's HCI-USB       | CODED (S=2) | -      |
-| RTL8761B         | Zephyr's HCI-USB       | CODED (S=8) | works  |
+| RTL8761B         | Zephyr HCI-USB         | 1M          | works  |
+| RTL8761B         | Zephyr HCI-USB         | CODED (S=2) | -      |
+| RTL8761B         | Zephyr HCI-USB         | CODED (S=8) | works  |
 
 ## Notes:  
 
@@ -28,10 +29,10 @@ were confirmed by nRF BLE sniffer (Nordic's nRF52840 dongle) with Wireshark.
    RTL8761C may work.
 
  - `HCI_LE_Set_Extended_Advertising_Parameters_V2_Command` for CSSA is not yet 
-   supoorted in Bumble (as of 0.0.230).
+   fully supoorted in Bumble (as of 0.0.230).
 
- -  Zephy's HCI-USB firmware was built for my Xiao nRF52840 (with bootloader) 
-    by using Zephyr-RTOS (v4.4) and Zephy-SDK (v1.0) as follows:
+ -  Zephyr's HCI-USB firmware was built for my Xiao nRF52840 (with bootloader) 
+    by using Zephyr-RTOS (v4.4) and Zephyr-SDK (v1.0) as follows:
 
 ``` bash
 west build -p always -b nrf52840dongle samples/bluetooth/hci_usb \
