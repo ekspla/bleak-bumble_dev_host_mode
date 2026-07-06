@@ -18,7 +18,7 @@ python examples/le_ext_adv_scanner.py
 Because Coding Scheme Selection on Advertising (CSSA) introduced in Bluetooth 5.4, 
 which allows to specify the coding parameter `S`, is not supported in Bumble host 
 and in my bluetooth controllers yet, two different controllers have to be used for 
-`S=2` and `S=8` in LE_CODED_PHY; RTL8761B was used for [`S=2`](figs/ext_adv_S2.jpg) coding while 
+`S=2` and `S=8` in LE_CODED_PHY; RTL8761B (another UB500) was used for [`S=2`](figs/ext_adv_S2.jpg) coding while 
 [Zephyr's HCI-USB](https://docs.zephyrproject.org/latest/samples/bluetooth/hci_usb/README.html) 
 \(Xiao nRF52840\) for [`S=8`](figs/ext_adv_S8.jpg). In all of the cases, **advertisement packets were 
 [confirmed](figs/le_ext_adv_wireshark.md) by nRF BLE sniffer** (Nordic's nRF52840 dongle) with Wireshark.  
