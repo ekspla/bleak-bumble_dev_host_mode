@@ -3,7 +3,7 @@
 ## Using a RTL8761B as scanner and an another RTL8761B or Zephyr HCI-USB as advertiser
 
 **Bleak-Bumble scanner / observer successfully worked with RTL8761B dongle** 
-(UB500, TP-Link) **in receiving extended advertisements (LE_1M_PHY and 
+(UB500, TP-Link, with fw 0xddd5c761) **in receiving extended advertisements (LE_1M_PHY and 
 LE_CODED_PHY S=2 / S=8)** sent from Bumble advertiser / broadcaster.  
 
 ``` bash
