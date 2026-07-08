@@ -34,8 +34,13 @@ and in my bluetooth controllers yet, two different controllers have to be used f
 
 ## Notes:  
 
- - Because CSSA is introduced in Bluetooth 5.4, the latest dongles such as 
-   RTL8761C may work.
+ - Because CSSA is introduced in Bluetooth 5.4, the latest dongles ~~such as 
+   RTL8761C~~ may work.
+
+ - A RTL8761CUV dongle has been bought and tested, only to fail in using LE_CODED_PHY. 
+   Receiving extended advertisements in LE_1M_PHY/LE_2M_PHY and changing from 1M to 2M and 
+   v.v. during connection worked perfectly though. I was not aware that *RTL8761C lacks 
+   LE_CODED functionality* before I saw the datasheet.
 
  - `HCI_LE_Set_Extended_Advertising_Parameters_V2_Command` for CSSA is not yet 
    fully supoorted in Bumble (as of 0.0.230).
