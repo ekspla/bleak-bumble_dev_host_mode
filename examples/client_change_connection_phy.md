@@ -3,7 +3,7 @@
 ## Using Bleak-Bumble with an RTL8761B dongle as scanner/client and Bumble with another RTL8761B dongle as advertiser/peripheral
 
 **Bleak-Bumble client successfully worked with RTL8761B dongle** (UB500, TP-Link, with fw 0xddd5c761) 
-**in using LE_1M_PHY, LE_2M_PHY and LE_CODED_PHY (S=2/S=8) during connections.**  In all of the cases, 
+**in using LE_1M_PHY, LE_2M_PHY and LE_CODED_PHY (S=2/S=8)** during connections. In all of the cases, 
 the packets were confirmed by nRF BLE sniffer (Nordic's nRF52840 dongle) with Wireshark.
 
 ``` bash

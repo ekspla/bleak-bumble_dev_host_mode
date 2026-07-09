@@ -1,6 +1,6 @@
 # An example of BLE 5 extended advertisement scanner with Bleak-Bumble
 
-## Using a RTL8761B as scanner and another RTL8761B or Zephyr HCI-USB as advertiser
+## Using an RTL8761B as scanner and another RTL8761B or Zephyr HCI-USB as advertiser
 
 **Bleak-Bumble scanner / observer successfully worked with RTL8761B dongle** 
 (UB500, TP-Link, with fw 0xddd5c761) **in receiving extended advertisements (LE_1M_PHY and 
