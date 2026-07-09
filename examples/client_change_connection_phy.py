@@ -1,22 +1,10 @@
 #!/usr/bin/env python
 """This example demonstrates how to get/set connection PHYs.
 
-It was tested with a pair of RTL8761B usb dongles on Linux, 
+It was tested with a pair of RTL8761B usb dongles 
 and was confirmed to work by using nRF BLE sniffer.
 
-NOTES:
- - My RTL8761B controllers always prefer S=2 in LE_CODED advertisement broadcast. 
-   This is in contrast to the explanation in Bluetooth specification as follows:
-   `If advertising on the LE Coded PHY, the S=8 coding shall be assumed.`
-
- - Coding Scheme Selection on Advertising (CSSA), which allows to specify the 
-   coding parameter `S`, is introduced in Bluetooth 5.4. RTL8761C probably works.
-
- - `HCI_LE_Set_Extended_Advertising_Parameters_V2_Command` for CSSA is not yet 
-   supoorted in Bumble==0.0.230.
-
- - During connection, `set_phy()` for S=8 with `phy_options=2` works as expected, 
-   while `phy_options=0`(no preference) fall back to S=2.
+For details, see `client_change_connection_phy.md`.
 """
 
 import asyncio

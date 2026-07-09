@@ -1,24 +1,11 @@
 #!/usr/bin/env python
-"""This example using a pair of controllers demonstrates LE extended advertisement.
+"""This example demonstrates LE extended advertisement.
 
 Bleak-Bumble scanner with RTL8761B dongle was successful in receiving extended 
-advertisements (LE_CODED_PHY S=2/S=8, LE_1M_PHY) sent from another RTL8761B as 
-well as from Zephyr's HCI-USB on nRF52840. The advertisement packets were 
-confirmed by nRF BLE sniffer in both cases.
+advertisements (LE_1M_PHY, LE_2M_PHY, LE_CODED_PHY S=2/S=8) sent from an advertiser 
+with another dongle.
 
-NOTES:
- - My RTL8761B controllers always prefer S=2 in LE_CODED advertisement broadcast. 
-   This is in contrast to the explanation in Bluetooth specification as follows:
-   `If advertising on the LE Coded PHY, the S=8 coding shall be assumed.`
-
- - A Zephyr's HCI-USB nRF52840 dongle used as a broadcaster always prefers S=8 
-   in LE_CODED advertisement, in agreement with the Bluetooth spec.
-
- - Coding Scheme Selection on Advertising (CSSA), which allows to specify the 
-   coding parameter `S`, is introduced in Bluetooth 5.4. RTL8761C probably works.
-
- - `HCI_LE_Set_Extended_Advertising_Parameters_V2_Command` for CSSA is not yet 
-   supoorted in Bumble==0.0.230.
+For details, see `le_ext_adv_scanner.md`.
 """
 
 import asyncio

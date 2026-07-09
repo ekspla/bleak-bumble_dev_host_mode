@@ -1,4 +1,4 @@
-# An example of BLE5 extended advertisement scanner with Bleak-Bumble
+# An example of BLE 5 extended advertisement scanner with Bleak-Bumble
 
 ## Using a RTL8761B as scanner and another RTL8761B or Zephyr HCI-USB as advertiser
 
