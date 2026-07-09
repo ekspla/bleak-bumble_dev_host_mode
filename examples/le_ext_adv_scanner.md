@@ -1,6 +1,6 @@
 # An example of BLE5 extended advertisement scanner with Bleak-Bumble
 
-## Using a RTL8761B as scanner and an another RTL8761B or Zephyr HCI-USB as advertiser
+## Using a RTL8761B as scanner and another RTL8761B or Zephyr HCI-USB as advertiser
 
 **Bleak-Bumble scanner / observer successfully worked with RTL8761B dongle** 
 (UB500, TP-Link, with fw 0xddd5c761) **in receiving extended advertisements (LE_1M_PHY and 
@@ -37,10 +37,11 @@ and in my bluetooth controllers yet, two different controllers have to be used f
  - Because CSSA is introduced in Bluetooth 5.4, the latest dongles ~~such as 
    RTL8761C~~ may work.
 
- - A RTL8761CUV dongle has been bought and tested, only to fail in using LE_CODED_PHY. 
+ - An RTL8761CUV dongle has been bought and tested, only to fail in using LE_CODED_PHY. 
    Receiving extended advertisements in LE_1M_PHY/LE_2M_PHY and changing from 1M to 2M and 
    v.v. during connection worked perfectly though. I was not aware that *RTL8761C lacks 
-   LE_CODED functionality* before I saw the datasheet.
+   LE_CODED functionality* before I bought it; should have seen 
+   [the datasheet](https://www.realmcu.com/en/Products/RTL8761C-Series).
 
  - `HCI_LE_Set_Extended_Advertising_Parameters_V2_Command` for CSSA is not yet 
    fully supoorted in Bumble (as of 0.0.230).
