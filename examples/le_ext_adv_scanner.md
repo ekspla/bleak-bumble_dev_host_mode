@@ -18,10 +18,12 @@ python examples/le_ext_adv_scanner.py
 Because Coding Scheme Selection on Advertising (CSSA) introduced in Bluetooth 5.4, 
 which allows to specify the coding parameter `S`, is not supported in Bumble host 
 and in my bluetooth controllers yet, two different controllers have to be used for 
-`S=2` and `S=8` in LE_CODED_PHY; RTL8761B (another UB500) was used for [`S=2`](figs/ext_adv_S2.jpg) coding while 
+`S=2` and `S=8` in LE_CODED_PHY. An RTL8761B (another UB500) and a 
 [Zephyr's HCI-USB](https://docs.zephyrproject.org/latest/samples/bluetooth/hci_usb/README.html) 
-\(Xiao nRF52840\) for [`S=8`](figs/ext_adv_S8.jpg). In all of the cases, **advertisement packets were 
-[confirmed](figs/le_ext_adv_wireshark.md) by nRF BLE sniffer** (Nordic's nRF52840 dongle) with Wireshark.  
+\(Xiao nRF52840\), respectively, were used for [`S=2`](figs/ext_adv_S2.jpg) and 
+[`S=8`](figs/ext_adv_S8.jpg) codings. In all of the cases, **advertisement packets were 
+[confirmed](figs/le_ext_adv_wireshark.md) by nRF BLE sniffer** (Nordic's nRF52840 dongle) and 
+Wireshark.  
 
 | Scanner/Observer | Advertiser/Broadcaster | PHY         | Result |
 | ---------------- | ---------------------- | ----------- | ------ |
@@ -44,7 +46,7 @@ and in my bluetooth controllers yet, two different controllers have to be used f
    [the datasheet](https://www.realmcu.com/en/Products/RTL8761C-Series).
 
  - `HCI_LE_Set_Extended_Advertising_Parameters_V2_Command` for CSSA is not yet 
-   fully supoorted in Bumble (as of 0.0.230).
+   fully suported in Bumble (as of 0.0.230).
 
  -  Zephyr's HCI-USB firmware was built for my Xiao nRF52840 (with bootloader) 
     by using Zephyr-RTOS (v4.4) and Zephyr-SDK (v1.0) as follows:

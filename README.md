@@ -9,7 +9,7 @@ This is a fork/modified version of [vChavezB/bleak-bumble](https://github.com/vC
 [on the obsolete Windows 7sp1](https://github.com/ekspla/xoss_sync#bleak-bumble) (BLE not supported natively)
 - **Detailed control**: Change of parameters \(
 [`connection interval`, `att mtu`](https://github.com/ekspla/micropython_aioble_examples/tree/main/nus_modem_full_ver#linux-and-also-windows-with-bumble-backend), 
-`data length`, [`connection PHYs`](examples/client_change_connection_phy.py), etc.\), 
+`data length`, [`connection PHYs`](examples/client_change_connection_phy.md), etc.\), 
 [pairing/bonding with delegate](examples/example_pairing.md) and 
 [scan LE extended advertisement](examples/le_ext_adv_scanner.md) using Bumble's API
 - **Virtual Bluetooth testing**: Perform Bluetooth functional tests without physical hardware using virtual Bluetooth stacks like 
