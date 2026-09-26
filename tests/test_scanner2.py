@@ -111,6 +111,7 @@ async def test_adv_data_simple(bumble_peripheral: Device):
     assert found_adv_data.service_data == {}
     assert found_adv_data.service_uuids == []
     assert found_adv_data.tx_power in (
+        0,
         None,
         HCI_LE_Extended_Advertising_Report_Event.TX_POWER_INFORMATION_NOT_AVAILABLE,
     )
@@ -156,6 +157,7 @@ async def test_adv_data_complex(bumble_peripheral: Device):
     }
     assert found_adv_data.service_uuids == ["0000180f-0000-1000-8000-00805f9b34fb"]
     assert found_adv_data.tx_power in (
+        0,
         123,
         HCI_LE_Extended_Advertising_Report_Event.TX_POWER_INFORMATION_NOT_AVAILABLE,
     )
