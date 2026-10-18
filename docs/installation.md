@@ -4,9 +4,9 @@ To install `bleak_bumble` of this fork, you need to install it along with its de
 
 ## Requirements
 
-- Python >= 3.10
+- Python >= 3.11
 - bleak == 3.0.2
-- bumble == 0.0.235
+- bumble == 0.0.236
 
 ## Installation Options
 
