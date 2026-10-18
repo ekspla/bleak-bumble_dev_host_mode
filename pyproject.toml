@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bleak_bumble"
-version = "0.0.7"
+version = "0.0.8"
 description = "Bumble transport layer for Bleak - Out-of-tree Bumble backend"
 authors = ["Victor Chavez <vchavezb@protonmail.com>"]
 license = "MIT"
@@ -23,9 +23,9 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.10"
+python = ">=3.11"
 bleak = "3.0.2"
-bumble = "0.0.235"
+bumble = "0.0.236"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"
